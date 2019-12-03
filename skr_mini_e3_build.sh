@@ -27,7 +27,7 @@ git -C ${MARLIN_DIR} describe --tags
 
 sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
-sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree_512K@' ${MARLIN_DIR}/platformio.ini
+sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree@' ${MARLIN_DIR}/platformio.ini
 
 
 
@@ -62,7 +62,6 @@ sed -i 's@#if HAS_TMC220x && !defined(TARGET_LPC1768) && ENABLED(ENDSTOP_INTERRU
 sed -i 's@/*#define ENDSTOP_INTERRUPTS_FEATURE@#define ENDSTOP_INTERRUPTS_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define FAN_SOFT_PWM@#define FAN_SOFT_PWM@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define TMC_DEBUG@#define TMC_DEBUG@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -80,6 +79,7 @@ sed -i 's@.*#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.55@g' ${MARLIN_DI
 sed -i 's@.*#define LCD_SET_PROGRESS_MANUALLY@#define LCD_SET_PROGRESS_MANUALLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define DOGM_SD_PERCENT@  #define DOGM_SD_PERCENT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_GCODES@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 600@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -87,7 +87,7 @@ sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAUL
 
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 10, 170, 50 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 10, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G27P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
@@ -126,13 +126,14 @@ sed -i 's@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@' ${MARLIN_DIR}/Ma
 sed -i 's@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -44, -6, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 44@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@    #define EXTRAPOLATE_BEYOND_GRID@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@  #define EXTRAPOLATE_BEYOND_GRID@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 # bltouch probe as z-endstop on z-endstop connector
+sed -i 's@#define Z_MAX_POS .*@#define Z_MAX_POS 240@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@' ${MARLIN_DIR}/Marlin/Configuration.h
 
