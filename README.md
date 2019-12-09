@@ -7,7 +7,7 @@ the precompiled firmware.bin presumes the use of Creality's official metal mount
 
 **WARNING:** The Z-STOP header is ignored, as the BLTouch is effectively used as an endstop.
 
-**WARNING:** Z_MAX_POS has been limited to 240, to account for thicker print beds.
+**WARNING:** Z_MAX_POS has been limited to 235, to account for thicker print beds.
 
 The precompiled firmware.bin was tested using a BLTouch SMART 3.1, if you are getting
 inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut

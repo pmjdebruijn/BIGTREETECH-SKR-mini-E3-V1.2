@@ -133,7 +133,7 @@ sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATO
 
 
 # bltouch probe as z-endstop on z-endstop connector
-sed -i 's@#define Z_MAX_POS .*@#define Z_MAX_POS 240@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define Z_MAX_POS .*@#define Z_MAX_POS 235@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define Z_SAFE_HOMING@#define Z_SAFE_HOMING@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@' ${MARLIN_DIR}/Marlin/Configuration.h
 
