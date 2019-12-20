@@ -2,23 +2,25 @@
 
 ## BLTouch (__REQUIRED__)
 
-**CRITICAL:** The BLTouch bed levelling sensor should be connected to the PROBE (and SERVO) headers,
+**CRITICAL:** The BLTouch bed levelling sensor should be connected to the `PROBE` (and `SERVO`) headers,
 and triple check the actual pinouts before powering on the board.
 
-**WARNING:** The Z-STOP header is ignored, as the BLTouch is effectively used as the Z axis endstop.
+**WARNING:** The `Z-STOP` header is ignored, as the BLTouch is effectively used as the Z-axis endstop.
 
-**INFO:** Z_MAX_POS has been limited to 235, to account for thicker print beds.
+**INFO:** `Z_MAX_POS` has been limited to 235, to account for thicker print beds.
 
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
 resulting in sensor-to-nozzle offsets of roughly -44mm, -6mm, -2mm (X, Y, Z).
 
-**TIP:** The precompiled firmware.bin was tested using a BLTouch SMART 3.1, if you are getting
-inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
+**TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
+getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
 located in device's top center. Turning the hexnut 90 degrees clockwise fixed it for me.
 
 ## Miscellaneous Notes
 
-Nozzle Park is builtin (you can use 'G27 P2' in your print end gcode).
+Supports remaining times, if enabled in your slicer software (via `M73` G-code).
+
+Nozzle Park is builtin (you can use `G27 P2` in your print end G-code).
 
 Junction deviation is builtin and enabled with a more conservative default value.
 
@@ -27,14 +29,18 @@ With Linear Advance enabled, you may want to slightly (5%) increase Infill/perim
 
 S-Curve acceleration is not available, as it's not fully compatible with Linear Advance.
 
-Advanced Pause Feature is builtin, but is as of yet untested.
+Advanced Pause Feature is builtin, but is as of yet _untested_.
 
-Filament Runout Sensor is builtin, but is as of yet untested
-and disabled by default (you can use 'M412 S1' in your print start gcode).
+Filament Load/Unload is builtin, but is as of yet _untested_.
 
-Maximum bed temperature has been limited to 80C for increased safety.
+Filament Runout Sensor is builtin, but is as of yet _untested_
+and _disabled by default_ (you can use `M412 S1` in your print start G-code).
 
-Maximum nozzle temperature has been limited to 250C for increased safety.
+Retuned hot-end PID loop.
+
+Maximum hot-end temperature has been limited to 250C for increased safety.
+
+Maximum heated-bed temperature has been limited to 80C for increased safety.
 
 ## Initial Setup
 

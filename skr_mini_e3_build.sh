@@ -21,7 +21,6 @@ python3 -m venv ${VENV_DIR}
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
 git -C ${MARLIN_DIR} checkout bugfix-2.0.x
-git -C ${MARLIN_DIR} describe --tags
 
 
 
@@ -65,31 +64,43 @@ sed -i 's@/*#define FAN_SOFT_PWM@#define FAN_SOFT_PWM@' ${MARLIN_DIR}/Marlin/Con
 
 
 
+# beware https://github.com/MarlinFirmware/Marlin/pull/16143
+sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
 # personal tweaks
 sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "(SKR mini E3)"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "SKR mini E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i 's@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@' ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET .*@  #define LEVEL_CORNERS_INSET 33@g' ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g' ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i 's@.*#define LIN_ADVANCE@#define LIN_ADVANCE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0.55@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define LCD_SET_PROGRESS_MANUALLY@#define LCD_SET_PROGRESS_MANUALLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define DOGM_SD_PERCENT@  #define DOGM_SD_PERCENT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
 sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
-# https://github.com/MarlinFirmware/Marlin/pull/16143
-sed -i 's@.*#define SD_CHECK_AND_RETRY@#//define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+# lcd tweaks
+sed -i 's@.*#define DOGM_SD_PERCENT@  #define DOGM_SD_PERCENT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define LCD_SET_PROGRESS_MANUALLY@#define LCD_SET_PROGRESS_MANUALLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define SHOW_REMAINING_TIME@  #define SHOW_REMAINING_TIME@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define USE_M73_REMAINING_TIME@    #define USE_M73_REMAINING_TIME@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define ROTATE_PROGRESS_DISPLAY@    #define ROTATE_PROGRESS_DISPLAY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 10, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 5, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G27P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
@@ -97,7 +108,7 @@ sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G27P2"
 # advanced pause (for multicolor)
 sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         40@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         80@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            6@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      350@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PARK_HEAD_ON_PAUSE@  #define PARK_HEAD_ON_PAUSE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -108,6 +119,13 @@ sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_G
 # filament runout sensor (but disabled by default)
 sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*runout.enabled = true@    runout.enabled = false@g' ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
+
+
+
+# PID retuning
+sed -i 's@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp 23.03@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki 1.68@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd 78.91@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -171,6 +189,6 @@ sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR
 
 (cd ${MARLIN_DIR}; ../${VENV_DIR}/bin/platformio run)
 
-
+git -C ${MARLIN_DIR} log -1
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
