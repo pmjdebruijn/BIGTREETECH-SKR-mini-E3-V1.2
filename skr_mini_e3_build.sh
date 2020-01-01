@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# SKR mini E3   Marlin 2.0   firmware build script
+# SKR mini E3 V1.2  -  Marlin 2.0  -  firmware build script
 #
-# Copyright (c) 2019 Pascal de Bruijn
+# Copyright (c) 2019-2020 Pascal de Bruijn
 #
 
 
@@ -20,7 +20,11 @@ python3 -m venv ${VENV_DIR}
 
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
-git -C ${MARLIN_DIR} checkout bugfix-2.0.x
+#git -C ${MARLIN_DIR} checkout bugfix-2.0.x
+
+git -C ${MARLIN_DIR} log -1
+
+git -C ${MARLIN_DIR} revert --no-edit 1c9ccce5209cd1727bf80e632f4f781c651e0c35
 
 
 
@@ -32,9 +36,9 @@ sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_bigtree@' ${MARLIN_DIR}/p
 
 cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration.h" "${MARLIN_DIR}/Marlin"
 cp "${MARLIN_DIR}/config/examples/Creality/Ender-3/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
-
 #cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration.h" "${MARLIN_DIR}/Marlin"
 #cp "${MARLIN_DIR}/config/examples/BigTreeTech/SKR Mini E3 1.2/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
+git -C ${MARLIN_DIR} commit -a -m "base example config"
 
 
 
@@ -70,10 +74,14 @@ sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR
 
 
 
+# save some space, since slicers don't use it
+sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
 # personal tweaks
 sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "(SKR mini E3)"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "SKR mini E3"@' ${MARLIN_DIR}/Marlin/Configuration.h
-
 sed -i 's@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -91,9 +99,24 @@ sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAUL
 
 sed -i 's@.*#define INDIVIDUAL_AXIS_HOMING_MENU@//#define INDIVIDUAL_AXIS_HOMING_MENU@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define HYBRID_THRESHOLD@  //#define HYBRID_THRESHOLD@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
 sed -i 's@.*#define SQUARE_WAVE_STEPPING@  //#define SQUARE_WAVE_STEPPING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
+# tmc stepper driver hybrid stealthchop/spreadcycle
+sed -i 's@.*#define HYBRID_THRESHOLD@  #define HYBRID_THRESHOLD@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     150@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     150@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define Z_HYBRID_THRESHOLD .*@  #define Z_HYBRID_THRESHOLD      10@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define E0_HYBRID_THRESHOLD .*@  #define E0_HYBRID_THRESHOLD     60@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
+# sorting (causes problems)
+#sed -i 's@.*#define SDCARD_SORT_ALPHA@  #define SDCARD_SORT_ALPHA@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#sed -i 's@.*#define SDSORT_USES_RAM .*@    #define SDSORT_USES_RAM    true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#sed -i 's@.*#define SDSORT_CACHE_NAMES .*@    #define SDSORT_CACHE_NAMES true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -109,18 +132,29 @@ sed -i 's@.*#define ROTATE_PROGRESS_DISPLAY@    #define ROTATE_PROGRESS_DISPLAY@
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 5, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G27P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G1 E-3 F3600\\nG27 P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 # advanced pause (for multicolor)
 sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         80@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         60@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            6@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      350@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*@  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   350@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define ADVANCED_PAUSE_PURGE_LENGTH .*@  #define ADVANCED_PAUSE_PURGE_LENGTH        100@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PARK_HEAD_ON_PAUSE@  #define PARK_HEAD_ON_PAUSE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_GCODES@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
+# firmware based retraction support (causes problems)
+#sed -i 's@.*//#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 6@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+#sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 60@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -135,6 +169,9 @@ sed -i 's@#define DEFAULT_Kp 21.73@#define DEFAULT_Kp 23.03@' ${MARLIN_DIR}/Marl
 sed -i 's@#define DEFAULT_Ki 1.54@#define DEFAULT_Ki 1.68@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define DEFAULT_Kd 76.55@#define DEFAULT_Kd 78.91@' ${MARLIN_DIR}/Marlin/Configuration.h
 
+
+
+# make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
 sed -i 's@.*#define PIDTEMPBED@//#define PIDTEMPBED@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
@@ -146,11 +183,6 @@ sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      90@g' ${MARLIN_DIR}/Ma
 
 # add a little more safety, limits selectable temp to 15 degrees less
 sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define HEATER_1_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define HEATER_2_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define HEATER_3_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define HEATER_4_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define HEATER_5_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -197,13 +229,13 @@ sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR
 # debugging
 #sed -i 's@/*#define MIN_SOFTWARE_ENDSTOP_Z@//#define MIN_SOFTWARE_ENDSTOP_Z@' ${MARLIN_DIR}/Marlin/Configuration.h
 #sed -i 's@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration.h
+#sed -i 's@.*#define TMC_DEBUG@  #define TMC_DEBUG@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 (cd ${MARLIN_DIR}; ../${VENV_DIR}/bin/platformio run)
 
-git -C ${MARLIN_DIR} log -1
-
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
+

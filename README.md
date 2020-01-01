@@ -33,6 +33,8 @@ With Linear Advance enabled, you may want to slightly (5%) increase Infill/perim
 
 S-Curve acceleration is not available, as it's not fully compatible with Linear Advance.
 
+Trinamic StealthChop/SpreadCycle hybrid threshold is enabled (tuneable via `M913` G-code).
+
 Advanced Pause Feature is builtin, but is as of yet _untested_.
 
 Filament Load/Unload is builtin, but is as of yet _untested_.
@@ -61,34 +63,47 @@ bed adhesion, in my particular case I ended up somewhere around -2.20mm.
 ## Example Start G-code for PrusaSlicer
 
 ```
-M104 S[first_layer_bed_temperature] ; pre-set extruder temperature
-M140 S[first_layer_bed_temperature] ; set bed temperature
+G90 ; use absolute coordinates
+M83 ; extruder relative mode
 
-M280 P0 S160 ; bltouch alarm release
-G4 P100 ; bltouch delay
-G28 ; home all axes
-G29 ; auto bed levelling
-G1 X5.0 Y25 Z50 F5000 ; lift nozzle
+M104 S[first_layer_bed_temperature] ; set extruder temp
+M140 S[first_layer_bed_temperature] ; set bed temp
 
-M104 S[first_layer_temperature] ; set extruder temperature
-M190 S[first_layer_bed_temperature] ; wait for bed temperature
-M109 S[first_layer_temperature] ; wait for extruder temperature
+G28 ; home all
+G29 ; auto bed levelling (bltouch)
 
-G92 E0 ; reset extruder
-G1 X5.0 Y25 Z[first_layer_height] F5000 ; move to start position
-G1 X5.0 Y210 Z[first_layer_height] F1500 E15 ; draw the first line
-G1 X5.3 Y210 Z[first_layer_height] F5000 ; move to side a little
-G1 X5.3 Y25 Z[first_layer_height] F1500 E30 ; draw the second line
-G92 E0 ; reset extruder
-G1 Z2.0 F5000 ; move z-axis up
+G1 X2 Y10 Z50 F3000 ; lift nozzle
+
+M104 S[first_layer_temperature] ; set extruder temp
+M190 S[first_layer_bed_temperature] ; wait for bed temp
+M109 S[first_layer_temperature] ; wait for extruder temp
+
+G1 X2 Y10 Z0.28 F240
+G92 E0
+G1 Y190 E15.0 F1500.0 ; intro line
+G1 X2.3 F5000
+G1 Y10 E30 F1200.0 ; intro line
+G92 E0
+
+G1 Z2.0 F3000 ; lift nozzle
+
 ```
 
 ## Example End G-code for PrusaSlicer
 
 ```
-M104 S0 ; turn off extruder heat
-M140 S0 ; turn off bed heat
-G1 E-2 F1500 ; retract filament
-G27 P2 ; park toolhead
-M84 ; disable motors
+G1 E-3 F3600 ; release nozzle pressure
+G27 P2 ; park toolhead and present print
+
+M104 S[first_layer_temperature] ; raise extruder temp
+G4 S45 ; allow the nozzle to release residual pressure through oozing
+
+M104 S0 ; turn off temperature
+M140 S0 ; turn off heatbed
+M107 ; turn off fan
+M84 X Y E ; disable motors
 ```
+
+## Recommended printable upgrades
+
+- [Ender 3 Cooling fan mod (CNC Kitchen)](https://www.thingiverse.com/thing:3437925)
