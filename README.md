@@ -22,7 +22,7 @@ and triple check the actual pinouts before powering on the board.
 
 **WARNING:** The `Z-STOP` header is ignored, as the BLTouch is effectively used as the Z-axis endstop.
 
-**INFO:** `Z_MAX_POS` has been limited to 225 to account for thicker print beds,
+**INFO:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
 a BMG style extruder upgrade and a leadscrew top mount upgrade.
 
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
@@ -58,7 +58,7 @@ Advanced Pause Feature is builtin, but is as of yet _untested_.
 Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by default_
 ([`M412 S1`](http://marlinfw.org/docs/gcode/M412.html) G-code).
 
-Retuned hot-end PID loop.
+Firmware Based Retraction is builtin, but is as of yet _untested_.
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
@@ -74,13 +74,19 @@ optical quality at the expense of dimensional accuracy.
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
 Finally, attempt a trivial print, lowering the Z-Offset until you get good
-bed adhesion, in my particular case I ended up somewhere around -2.20--2.30mm.
+bed adhesion, in my particular case I ended up somewhere around -2.20mm
+(this is somewhat affected by nozzle wear).
 
 ## PrusaSlicer Printer Settings
 
-* Max print height: 225
+* Bed shape: 220x220 (-5.5x-5.5)
+* Max print height: 220
 * Supports remaining times: ENABLE
+* Retraction Length: 5
+* Retraction Speed: 80
 * Retract on layer change: DISABLE
+* Wipe while retracting: ENABLE
+* Retract amount before wipe: 60
 
 ## PrusaSlicer Start G-code
 
@@ -104,21 +110,24 @@ G1 X2 Y10 Z0.28 F240
 G92 E0
 G1 Y190 E15.0 F1500.0 ; intro line
 G1 X2.3 F3600
-G1 Y10 E30 F1200.0 ; intro line
+G1 Y10 E15.0 F1200.0 ; intro line
 G92 E0
 ```
 
 ## PrusaSlicer End G-code
 
 ```
-G1 E-3 F3600 ; release nozzle pressure
-G27 P2 ; park toolhead and present print
+G91
+G1 Z1 E-3 F4800 ; release nozzle pressure
+G27 P2
+
+M140 S0 ; turn off heatbed
 
 M104 S[first_layer_temperature] ; raise extruder temp
 G4 S45 ; allow the nozzle to release residual pressure through oozing
 
 M104 S0 ; turn off temperature
-M140 S0 ; turn off heatbed
+
 M107 ; turn off fan
 M84 X Y E ; disable motors
 ```
