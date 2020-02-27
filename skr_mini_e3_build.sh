@@ -7,7 +7,7 @@
 
 
 
-BRANCH=bugfix-2.0.x
+BRANCH=2.0.x
 
 
 
@@ -44,6 +44,12 @@ cp "${CONFIG_DIR}/config/examples/Creality/Ender-3/Configuration_adv.h" "${MARLI
 
 
 git -C ${MARLIN_DIR} commit -a -m "$0: base example config"
+
+
+
+# Configuration repository hasn't been updated yet
+sed -i 's@#define CONFIGURATION_H_VERSION 020000@#define CONFIGURATION_H_VERSION 020004@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define CONFIGURATION_ADV_H_VERSION 020000@#define CONFIGURATION_ADV_H_VERSION 020004@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -101,7 +107,7 @@ sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IM
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 } @g' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.05@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LIN_ADVANCE@#define LIN_ADVANCE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -134,6 +140,14 @@ sed -i 's@.*#define MONITOR_DRIVER_STATUS@  #define MONITOR_DRIVER_STATUS@' ${MA
 
 
 
+# tmc microstepping
+sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160, 160, 400, 93 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define X_MICROSTEPS .*@    #define X_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define Y_MICROSTEPS .*@    #define Y_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+
+
+
 # sorting
 sed -i 's@.*#define SDCARD_SORT_ALPHA@  #define SDCARD_SORT_ALPHA@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define SDSORT_USES_RAM .*@    #define SDSORT_USES_RAM    true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -153,20 +167,20 @@ sed -i 's@.*#define ROTATE_PROGRESS_DISPLAY@    #define ROTATE_PROGRESS_DISPLAY@
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 5, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G91\\nG1 Z1 E-3 F4800\\nG27 P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G91\\nG1 Z1 E-3 F2400\\nG27 P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 # advanced pause (for multicolor)
 sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         80@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            5@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     25@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         40@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            6@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      470@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  25@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*@  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   370@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define ADVANCED_PAUSE_PURGE_LENGTH .*@  #define ADVANCED_PAUSE_PURGE_LENGTH         80@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define ADVANCED_PAUSE_PURGE_LENGTH .*@  #define ADVANCED_PAUSE_PURGE_LENGTH        100@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PARK_HEAD_ON_PAUSE@  #define PARK_HEAD_ON_PAUSE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_GCODES@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -174,8 +188,8 @@ sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_G
 
 # firmware based retraction support
 sed -i 's@.*//#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 80@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 6@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 40@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 

@@ -4,9 +4,9 @@
 > The firmware.bin supplied in this repository requires the use of the extended
 > 512KB of flash seemingly available on most of these boards. The second
 > 256KB half is that flash is officially out of spec, and therefore maybe
-> more prone to unpredictable failures.
+> possibly more prone to unpredictable failures.
 >
-> **Use this firmware at your own peril.**
+> **USE THIS FIRMWARE AT YOUR OWN PERIL**
 >
 > More information available:
 > [here](https://www.youtube.com/watch?v=EBIahC1P2e0),
@@ -26,7 +26,7 @@ and triple check the actual pinouts before powering on the board.
 a BMG style extruder upgrade and a leadscrew top mount upgrade.
 
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
-resulting in sensor-to-nozzle offsets of roughly -44mm, -6mm, -2mm (X, Y, Z).
+resulting in sensor-to-nozzle offsets of roughly -43mm, -5mm, -2mm (X, Y, Z).
 
 **TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
 getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
@@ -34,17 +34,17 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 
 ## Important Notes
 
+X/Y Microstepping has been increased to 32 (resulting in 160 steps/mm).
+
+S-Curve acceleration is enabled.
+
+Junction deviation is builtin and enabled with a more conservative default value.
+
 Supports remaining times, if enabled in your slicer software
 ([`M73`](http://marlinfw.org/docs/gcode/M073.html) G-code).
 
 Nozzle Park is builtin
 (you can use [`G27 P2`](http://marlinfw.org/docs/gcode/G027.html) in your print end G-code).
-
-Junction deviation is builtin and enabled with a more conservative default value.
-
-Linear Advance is builtin but is now disabled by default.
-
-S-Curve acceleration is not available, as it's not fully compatible with Linear Advance.
 
 Trinamic StealthChop/SpreadCycle hybrid threshold is enabled
 ([`M913`](http://marlinfw.org/docs/gcode/M913.html) G-code).
@@ -64,6 +64,8 @@ Maximum hot-end temperature has been limited to 250C for increased safety.
 
 Maximum heated-bed temperature has been limited to 80C for increased safety.
 
+Linear Advance is no longer builtin.
+
 ## Initial Setup
 
 After flashing the precompiled firmware.bin, if desired, you should (re-)calibrate 
@@ -74,7 +76,7 @@ optical quality at the expense of dimensional accuracy.
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
 Finally, attempt a trivial print, lowering the Z-Offset until you get good
-bed adhesion, in my particular case I ended up somewhere around -2.20mm
+bed adhesion, in my particular case I ended up somewhere around -2.10mm
 (this is somewhat affected by nozzle wear).
 
 ## PrusaSlicer Printer Settings
@@ -82,11 +84,11 @@ bed adhesion, in my particular case I ended up somewhere around -2.20mm
 * Bed shape: 220x220 (-5.5x-5.5)
 * Max print height: 220
 * Supports remaining times: ENABLE
-* Retraction Length: 5
-* Retraction Speed: 80
+* Retraction Length: 6
+* Retraction Speed: 40
 * Retract on layer change: DISABLE
 * Wipe while retracting: ENABLE
-* Retract amount before wipe: 60
+* Retract amount before wipe: 0
 
 ## PrusaSlicer Start G-code
 
@@ -141,4 +143,5 @@ M84 X Y E ; disable motors
 - [FYSETC Leadscrew Top Mount](https://aliexpress.com/item/33013348068.html)
 - [Micro Swiss MK8 Plated Wear Resistant Nozzle .4mm](https://store.micro-swiss.com/products/mk8)
 - [Capricorn XS Bowden tube](https://www.captubes.com/)
+- [Original Hot End Fix Creality](https://www.thingiverse.com/thing:3203831) ([YouTube](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
 - [Ender 3 Cooling fan mod (CNC Kitchen)](https://www.thingiverse.com/thing:3437925)
