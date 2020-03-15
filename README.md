@@ -14,6 +14,7 @@
 > [here](https://www.youtube.com/watch?v=q0JEx3uzgSo).
 >
 > If you're having issues updating your SKR-mini-E3 V1.2 firmware, try reformatting your SD card.
+> If you're seeing unexpected behavior, please try resetting the Configuration to defaults.
 
 ## BLTouch (__REQUIRED__)
 
@@ -21,9 +22,6 @@
 and triple check the actual pinouts before powering on the board.
 
 **WARNING:** The `Z-STOP` header is ignored, as the BLTouch is effectively used as the Z-axis endstop.
-
-**INFO:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
-a BMG style extruder upgrade and a leadscrew top mount upgrade.
 
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
 resulting in sensor-to-nozzle offsets of roughly -43mm, -5mm, -2mm (X, Y, Z).
@@ -34,7 +32,10 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 
 ## Important Notes
 
-X/Y Microstepping has been increased to 32 (resulting in 160 steps/mm).
+**WARNING:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
+a BMG style extruder upgrade and a leadscrew top mount upgrade.
+
+**WARNING:** X/Y Microstepping has been increased to 32 (resulting in 160 steps/mm).
 
 S-Curve acceleration is enabled.
 
@@ -49,7 +50,7 @@ Nozzle Park is builtin
 Trinamic StealthChop/SpreadCycle hybrid threshold is enabled
 ([`M913`](http://marlinfw.org/docs/gcode/M913.html) G-code).
 
-Unload Filament is builtin, with limited testing as of yet.
+Load/Unload Filament is builtin.
 ([`M702`](http://marlinfw.org/docs/gcode/M702.html) G-code).
 
 Advanced Pause Feature is builtin, but is as of yet _untested_.
@@ -69,9 +70,7 @@ Linear Advance is no longer builtin.
 ## Initial Setup
 
 After flashing the precompiled firmware.bin, if desired, you should (re-)calibrate 
-your extruder (E-steps) first. Keep in mind that Creality's default 93 E-steps
-purposefully slightly underextrudes, which typically benefits your prints
-optical quality at the expense of dimensional accuracy.
+your extruder (E-steps) first.
 
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
@@ -84,11 +83,12 @@ bed adhesion, in my particular case I ended up somewhere around -2.10mm
 * Bed shape: 220x220 (-5.5x-5.5)
 * Max print height: 220
 * Supports remaining times: ENABLE
-* Retraction Length: 6
-* Retraction Speed: 40
+* Retraction Length: 6 (for ID2.0 tubing like Capricorn TL)
+* Retraction Length: 4 (for ID1.9 tubing like Capricorn XS)
+* Retraction Speed: 25
 * Retract on layer change: DISABLE
 * Wipe while retracting: ENABLE
-* Retract amount before wipe: 0
+* Retract amount before wipe: 70
 
 ## PrusaSlicer Start G-code
 
