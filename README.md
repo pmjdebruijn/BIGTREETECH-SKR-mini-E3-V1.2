@@ -38,6 +38,9 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 **WARNING:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
 a BMG style extruder upgrade and a leadscrew top mount upgrade.
 
+**INFO:** The status screen flow rate deadzone has been increased, so it's more difficult to
+accidentally trigger flow rate changes from the status screen.
+
 S-Curve acceleration is enabled.
 
 Junction deviation is builtin and enabled with a more conservative default value.
