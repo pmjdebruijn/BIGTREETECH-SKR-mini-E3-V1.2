@@ -65,11 +65,15 @@ Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by 
 
 Firmware Based Retraction is builtin, but is as of yet _untested_.
 
+Linear Advance is builtin but disabled by default and is as of yet _untested_.
+
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
 Maximum heated-bed temperature has been limited to 80C for increased safety.
 
-Linear Advance is no longer builtin.
+Maximum filename length has been increased.
+
+Hotend is listed as E0 (as opposed to E1) to match Marlin source configuration files.
 
 ## Initial Setup
 
@@ -151,5 +155,5 @@ M84 X Y E ; disable motors
 - [Micro Swiss MK8 Plated Wear Resistant Nozzle .4mm](https://store.micro-swiss.com/products/mk8)
 - [Capricorn XS Bowden Tubing](https://www.captubes.com/)
 - [Original Hot End Fix Creality](https://www.thingiverse.com/thing:3203831) ([YouTube](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
-- [Ender 3 EZ Vent Remix](https://www.thingiverse.com/thing:3864519)
+- [Creality Ender 3 part cooling fan duct](https://www.thingiverse.com/thing:3091300) printed in [Extrudr GreenTec Pro](https://www.extrudr.com/en/products/catalogue/green-tec-pro-schwarz_2284/)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
