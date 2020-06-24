@@ -24,6 +24,9 @@ python3 -m venv ${VENV_DIR}
 
 
 git clone https://github.com/MarlinFirmware/Configurations ${CONFIG_DIR}
+
+git -C ${CONFIG_DIR} checkout release-2.0.5
+
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
 git -C ${MARLIN_DIR} checkout ${BRANCH}
@@ -36,6 +39,7 @@ sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/p
 
 sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_btt_512K@' ${MARLIN_DIR}/platformio.ini
 
+sed -i 's@https://github.com/adafruit/Adafruit_MAX31865/archive/master.zip@https://github.com/adafruit/Adafruit_MAX31865/archive/1.1.0.zip@' ${MARLIN_DIR}/platformio.ini
 
 
 cp "${CONFIG_DIR}/config/examples/Creality/Ender-3/Configuration.h" "${MARLIN_DIR}/Marlin"
@@ -70,12 +74,11 @@ sed -i 's@.*#define SDCARD_CONNECTION .*@    #define SDCARD_CONNECTION ONBOARD@'
 
 # discovered from BigTreeTech reference firmware sources
 sed -i 's@/*#define ENDSTOP_INTERRUPTS_FEATURE@#define ENDSTOP_INTERRUPTS_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define FAN_SOFT_PWM@#define FAN_SOFT_PWM@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
 # beware https://github.com/MarlinFirmware/Marlin/pull/16143
-sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -98,13 +101,12 @@ sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IM
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 } @g' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define CLASSIC_JERK@#define CLASSIC_JERK@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define DEFAULT_XJERK .*@   #define DEFAULT_XJERK 5.0@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define DEFAULT_YJERK .*@   #define DEFAULT_YJERK 5.0@' ${MARLIN_DIR}/Marlin/Configuration.h
 
+sed -i 's@.*#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 1000 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define S_CURVE_ACCELERATION@#define S_CURVE_ACCELERATION@g' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define LIN_ADVANCE@#define LIN_ADVANCE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define LIN_ADVANCE_K .*@  #define LIN_ADVANCE_K 0@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-sed -i 's@.*#define ENDSTOPS_ALWAYS_ON_DEFAULT@#define ENDSTOPS_ALWAYS_ON_DEFAULT@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 sed -i 's@.*#define INDIVIDUAL_AXIS_HOMING_MENU@//#define INDIVIDUAL_AXIS_HOMING_MENU@' ${MARLIN_DIR}/Marlin/Configuration.h
 
@@ -113,7 +115,6 @@ sed -i 's@.*#define SQUARE_WAVE_STEPPING@  #define SQUARE_WAVE_STEPPING@' ${MARL
 sed -i 's@.*#define ARC_SUPPORT@#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 sed -i 's@.*#define BLOCK_BUFFER_SIZE .*@  #define BLOCK_BUFFER_SIZE 32@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-#sed -i 's@.*#define BUFSIZE .*@#define BUFSIZE 32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h        # PROBLEM
 sed -i 's@.*#define TX_BUFFER_SIZE .*@#define TX_BUFFER_SIZE 32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define LONG_FILENAME_HOST_SUPPORT@  #define LONG_FILENAME_HOST_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -127,15 +128,6 @@ sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     160@g
 sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     160@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define Z_HYBRID_THRESHOLD .*@  #define Z_HYBRID_THRESHOLD      20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define E0_HYBRID_THRESHOLD .*@  #define E0_HYBRID_THRESHOLD     20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-sed -i 's@.*#define MONITOR_DRIVER_STATUS@  #define MONITOR_DRIVER_STATUS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-
-
-# tmc microstepping
-sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160, 160, 400, 93 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define X_MICROSTEPS .*@    #define X_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define Y_MICROSTEPS .*@    #define Y_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -169,7 +161,7 @@ sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G91\\n
 sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         25@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            6@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH            3@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     15@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      470@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  15@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -180,17 +172,16 @@ sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_G
 
 
 
-# firmware based retraction support
-sed -i 's@.*//#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 6@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-
-
 # filament runout sensor (but disabled by default)
 sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*runout.enabled = true@    runout.enabled = false@g' ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
 
+
+
+# default autotune to 200C
+sed -i 's#autotune_temp\[HOTENDS\] = ARRAY_BY_HOTENDS1(150)#autotune_temp[HOTENDS] = ARRAY_BY_HOTENDS1(200)#'  ${MARLIN_DIR}/Marlin/src/lcd/menu/menu_advanced.cpp
+sed -i 's%#include "../gcode.h"%#include "../gcode.h"\n#include "../../lcd/ultralcd.h"%' ./Marlin/Marlin/src/gcode/temp/M303.cpp
+sed -i 's%  thermalManager.PID_autotune(temp, e, c, u);%  ui.set_status("Autotuning PID...");\n  thermalManager.PID_autotune(temp, e, c, u);\n  ui.reset_status();%' ${MARLIN_DIR}/Marlin/src/gcode/temp/M303.cpp
 
 
 # make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
@@ -200,6 +191,11 @@ sed -i 's@.*#define PIDTEMPBED@//#define PIDTEMPBED@' ${MARLIN_DIR}/Marlin/Confi
 
 # add a little more safety, limits selectable temp to 10 degrees less
 sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      90@g' ${MARLIN_DIR}/Marlin/Configuration.h
+
+
+
+# add a little more safety against too cold filament
+sed -i 's@#define EXTRUDE_MINTEMP .*@#define EXTRUDE_MINTEMP 175@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -248,16 +244,8 @@ sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR
 
 
 
-# debugging
-#sed -i 's@/*#define MIN_SOFTWARE_ENDSTOP_Z@//#define MIN_SOFTWARE_ENDSTOP_Z@' ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i 's@/*#define DEBUG_LEVELING_FEATURE@#define DEBUG_LEVELING_FEATURE@g' ${MARLIN_DIR}/Marlin/Configuration.h
-#sed -i 's@.*#define TMC_DEBUG@  #define TMC_DEBUG@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-
-
 (cd ${MARLIN_DIR}; ../${VENV_DIR}/bin/platformio run)
 
 grep 'STRING_DISTRIBUTION_DATE.*"' ${MARLIN_DIR}/Marlin/src/inc/Version.h
 
 ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.bin
-

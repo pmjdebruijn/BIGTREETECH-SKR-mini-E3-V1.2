@@ -13,6 +13,10 @@
 > [here](https://www.youtube.com/watch?v=7Utygr71p8s) and
 > [here](https://www.youtube.com/watch?v=q0JEx3uzgSo).
 >
+> Also make sure to watch:
+> [this](https://www.youtube.com/watch?v=VK_K6fp4BIk) and
+> [this](https://www.youtube.com/watch?v=ckQ9UWlmdVA).
+>
 > If you're having issues updating your SKR-mini-E3 V1.2 firmware, try reformatting your SD card.
 >
 > If you're seeing unexpected behavior, please try resetting the Configuration to defaults.
@@ -33,17 +37,17 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 
 ## Important Notes
 
-**CRITICAL:** X/Y Microstepping has been increased to 32 (resulting in 160 steps/mm).
+**CRITICAL:** X/Y Microstepping has been reverted to 16 (resulting in 80 steps/mm again).
 
 **WARNING:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
 a BMG style extruder upgrade and a leadscrew top mount upgrade.
 
-**INFO:** The status screen flow rate deadzone has been increased, so it's more difficult to
+The status screen flow rate deadzone has been increased, so it's more difficult to
 accidentally trigger flow rate changes from the status screen.
 
 S-Curve acceleration is enabled.
 
-Junction deviation is builtin and enabled with a more conservative default value.
+Junction Deviation has been reverted back to Classic Jerk with conservative default values.
 
 Supports remaining times, if enabled in your slicer software
 ([`M73`](http://marlinfw.org/docs/gcode/M073.html) G-code).
@@ -62,10 +66,6 @@ Advanced Pause Feature is builtin, but is as of yet _untested_.
 
 Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by default_
 ([`M412 S1`](http://marlinfw.org/docs/gcode/M412.html) G-code).
-
-Firmware Based Retraction is builtin, but is as of yet _untested_.
-
-Linear Advance is builtin but disabled by default and is as of yet _untested_.
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
@@ -86,7 +86,7 @@ to multiply your E-steps by ~0.97, causing slight but intentional underextrusion
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
 Finally, attempt a trivial print, lowering the Z-Offset until you get good
-bed adhesion, in my particular case I ended up somewhere around -2.10mm
+bed adhesion, in my particular case I ended up somewhere around -2.00mm
 (this is somewhat affected by nozzle wear).
 
 ## PrusaSlicer Printer Settings
@@ -94,8 +94,9 @@ bed adhesion, in my particular case I ended up somewhere around -2.10mm
 * Bed shape: 220x220 (-5.5x-5.5)
 * Max print height: 220
 * Supports remaining times: ENABLE
-* Retraction Length: 6 (for ID2.0 tubing like Capricorn TL)
-* Retraction Length: 4 (for ID1.9 tubing like Capricorn XS)
+* Retraction Length: 6 (for ID2.0 tubing like Capricorn TL with a Creality hotend)
+* Retraction Length: 4 (for ID1.9 tubing like Capricorn XS with a Creality hotend and [hotend fix](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
+* Retraction Length: 3 (for ID1.9 tubing like Capricorn XS with a Micro Swiss hotend)
 * Retraction Speed: 25
 * Retract on layer change: DISABLE
 * Wipe while retracting: ENABLE
@@ -152,8 +153,7 @@ M84 X Y E ; disable motors
 - [ANTCLABS BLTouch SMART 3.1 with the Creality metal mounting bracket](https://www.antclabs.com/bltouch-v3)
 - [FYSETC All Metal BMG Bowden Extruder](https://aliexpress.com/item/33047017792.html)
 - [FYSETC Leadscrew Top Mount](https://aliexpress.com/item/33013348068.html)
+- [Micro Swiss All Metal Hotend](https://store.micro-swiss.com/products/all-metal-hotend-kit-for-cr-10)
 - [Micro Swiss MK8 Plated Wear Resistant Nozzle .4mm](https://store.micro-swiss.com/products/mk8)
 - [Capricorn XS Bowden Tubing](https://www.captubes.com/)
-- [Original Hot End Fix Creality](https://www.thingiverse.com/thing:3203831) ([YouTube](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
-- [Creality Ender 3 part cooling fan duct](https://www.thingiverse.com/thing:3091300) printed in [Extrudr GreenTec Pro](https://www.extrudr.com/en/products/catalogue/green-tec-pro-schwarz_2284/)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
