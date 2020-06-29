@@ -7,7 +7,7 @@
 
 
 
-BRANCH=2.0.x
+BRANCH=bugfix-2.0.x
 
 
 
@@ -25,7 +25,7 @@ python3 -m venv ${VENV_DIR}
 
 git clone https://github.com/MarlinFirmware/Configurations ${CONFIG_DIR}
 
-git -C ${CONFIG_DIR} checkout release-2.0.5
+git -C ${CONFIG_DIR} checkout ${BRANCH}
 
 git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
@@ -39,11 +39,9 @@ sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/p
 
 sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_btt_512K@' ${MARLIN_DIR}/platformio.ini
 
-sed -i 's@https://github.com/adafruit/Adafruit_MAX31865/archive/master.zip@https://github.com/adafruit/Adafruit_MAX31865/archive/1.1.0.zip@' ${MARLIN_DIR}/platformio.ini
-
-
-cp "${CONFIG_DIR}/config/examples/Creality/Ender-3/Configuration.h" "${MARLIN_DIR}/Marlin"
-cp "${CONFIG_DIR}/config/examples/Creality/Ender-3/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
+cp "${CONFIG_DIR}/config/examples/Creality/Ender-3 Pro/Configuration.h" "${MARLIN_DIR}/Marlin"
+cp "${CONFIG_DIR}/config/examples/Creality/Ender-3 Pro/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
+cp "${CONFIG_DIR}/config/examples/Creality/Ender-3 Pro/_Statusscreen.h" "${MARLIN_DIR}/Marlin"
 
 
 
@@ -70,10 +68,7 @@ sed -i 's@.*#define CR10_STOCKDISPLAY@#define CR10_STOCKDISPLAY@' ${MARLIN_DIR}/
 
 sed -i 's@.*#define SDCARD_CONNECTION .*@    #define SDCARD_CONNECTION ONBOARD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-
-
-# discovered from BigTreeTech reference firmware sources
-sed -i 's@/*#define ENDSTOP_INTERRUPTS_FEATURE@#define ENDSTOP_INTERRUPTS_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define EEPROM_AUTO_INIT@#define EEPROM_AUTO_INIT@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 
@@ -96,10 +91,9 @@ sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "SKR mini E
 
 sed -i 's@.*#define SHOW_BOOTSCREEN@//#define SHOW_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define SHOW_CUSTOM_BOOTSCREEN@//#define SHOW_CUSTOM_BOOTSCREEN@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define CUSTOM_STATUS_SCREEN_IMAGE@//#define CUSTOM_STATUS_SCREEN_IMAGE@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 } @g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 }@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define CLASSIC_JERK@#define CLASSIC_JERK@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define DEFAULT_XJERK .*@   #define DEFAULT_XJERK 5.0@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -121,11 +115,13 @@ sed -i 's@.*#define LONG_FILENAME_HOST_SUPPORT@  #define LONG_FILENAME_HOST_SUPP
 
 
 # tmc stepper driver hybrid stealthchop/spreadcycle
+sed -i 's@.*#define MONITOR_DRIVER_STATUS@  #define MONITOR_DRIVER_STATUS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
 sed -i 's@.*#define ADAPTIVE_STEP_SMOOTHING@#define ADAPTIVE_STEP_SMOOTHING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 sed -i 's@.*#define HYBRID_THRESHOLD@  #define HYBRID_THRESHOLD@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     160@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     160@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     170@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     170@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define Z_HYBRID_THRESHOLD .*@  #define Z_HYBRID_THRESHOLD      20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define E0_HYBRID_THRESHOLD .*@  #define E0_HYBRID_THRESHOLD     20@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -141,7 +137,7 @@ sed -i 's@.*#define SDSORT_CACHE_VFATS .*@    #define SDSORT_CACHE_VFATS 3@' ${M
 
 # lcd tweaks
 sed -i '$ a #define NUMBER_TOOLS_FROM_0' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define ENCODER_FEEDRATE_DEADZONE .*@  #define ENCODER_FEEDRATE_DEADZONE 12@g' Marlin/Marlin/src/inc/Conditionals_LCD.h
+sed -i 's@.*#define ENCODER_FEEDRATE_DEADZONE .*@  #define ENCODER_FEEDRATE_DEADZONE 12@g' ${MARLIN_DIR}/Marlin/src/inc/Conditionals_LCD.h
 sed -i 's@.*#define DOGM_SD_PERCENT@  #define DOGM_SD_PERCENT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define LCD_SET_PROGRESS_MANUALLY@#define LCD_SET_PROGRESS_MANUALLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define SHOW_REMAINING_TIME@  #define SHOW_REMAINING_TIME@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -176,12 +172,6 @@ sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_G
 sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*runout.enabled = true@    runout.enabled = false@g' ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
 
-
-
-# default autotune to 200C
-sed -i 's#autotune_temp\[HOTENDS\] = ARRAY_BY_HOTENDS1(150)#autotune_temp[HOTENDS] = ARRAY_BY_HOTENDS1(200)#'  ${MARLIN_DIR}/Marlin/src/lcd/menu/menu_advanced.cpp
-sed -i 's%#include "../gcode.h"%#include "../gcode.h"\n#include "../../lcd/ultralcd.h"%' ./Marlin/Marlin/src/gcode/temp/M303.cpp
-sed -i 's%  thermalManager.PID_autotune(temp, e, c, u);%  ui.set_status("Autotuning PID...");\n  thermalManager.PID_autotune(temp, e, c, u);\n  ui.reset_status();%' ${MARLIN_DIR}/Marlin/src/gcode/temp/M303.cpp
 
 
 # make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
@@ -225,7 +215,7 @@ sed -i 's@/*#define LCD_BED_LEVELING@#define LCD_BED_LEVELING@' ${MARLIN_DIR}/Ma
 sed -i 's@/*#define AUTO_BED_LEVELING_BILINEAR@#define AUTO_BED_LEVELING_BILINEAR@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define GRID_MAX_POINTS_X .*@  #define GRID_MAX_POINTS_X 3@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -43, -5, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@/*#define MIN_PROBE_EDGE .*@#define MIN_PROBE_EDGE 43@g' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@/*#define PROBING_MARGIN .*@#define PROBING_MARGIN 43@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@g' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_XY .*@  #define BABYSTEP_MULTIPLICATOR_XY 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -240,7 +230,7 @@ sed -i 's@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_
 
 
 # use probe connector as z-endstop connector
-sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN         PC14@g' ${MARLIN_DIR}/Marlin/src/pins/stm32f1/pins_BTT_SKR_MINI_E3.h
+sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN                          PC14  // "Z-STOP" (BLTouch)@g' ${MARLIN_DIR}/Marlin/src/pins/stm32f1/pins_BTT_SKR_MINI_E3_common.h
 
 
 
