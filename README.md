@@ -31,6 +31,9 @@ and triple check the actual pinouts before powering on the board.
 **INFO:** The precompiled firmware.bin presumes the use of Creality's official metal mounting bracket,
 resulting in sensor-to-nozzle offsets of roughly -43mm, -5mm, -2mm (X, Y, Z).
 
+**INFO:** High Speed mode is enabled, therefore a BLTouch SMART 3.0 or higher may be required, and
+compatibility with clone sensors may be reduced.
+
 **TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
 getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
 located in device's top center. Turning the hexnut 90 degrees clockwise fixed it for me.
@@ -66,6 +69,9 @@ Advanced Pause Feature is builtin, but is as of yet _untested_.
 
 Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by default_
 ([`M412 S1`](http://marlinfw.org/docs/gcode/M412.html) G-code).
+
+Power Loss Recovery is builtin, but is as of yet _untested_ and _disabled by default_
+([`M413 S1`](http://marlinfw.org/docs/gcode/M413.html) G-code).
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
