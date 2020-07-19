@@ -34,6 +34,10 @@ resulting in sensor-to-nozzle offsets of roughly -43mm, -5mm, -2mm (X, Y, Z).
 **INFO:** High Speed mode is enabled, therefore a BLTouch SMART 3.0 or higher may be required, and
 compatibility with clone sensors may be reduced.
 
+**INFO:** During print relative Babystepping is now regular absolute Z-Offset, which should making
+dialing in the Z-Offset much easier. Particularly with the embedded Z Calibration PLA print
+available in the Calibration menu.
+
 **TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
 getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
 located in device's top center. Turning the hexnut 90 degrees clockwise fixed it for me.
@@ -50,7 +54,7 @@ accidentally trigger flow rate changes from the status screen.
 
 S-Curve acceleration is enabled.
 
-Junction Deviation has been reverted back to Classic Jerk with conservative default values.
+Junction deviation is builtin and enabled with a more conservative default value.
 
 Supports remaining times, if enabled in your slicer software
 ([`M73`](http://marlinfw.org/docs/gcode/M073.html) G-code).
@@ -100,11 +104,10 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 * Bed shape: 220x220 (-5.5x-5.5)
 * Max print height: 220
 * Supports remaining times: ENABLE
-* Retraction Length: 6 (for ID2.0 tubing like Capricorn TL with a Creality hotend)
-* Retraction Length: 4 (for ID1.9 tubing like Capricorn XS with a Creality hotend and [hotend fix](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
-* Retraction Length: 3 (for ID1.9 tubing like Capricorn XS with a Micro Swiss hotend)
+* Retraction Length: 6.0 (for ID2.0 tubing like Capricorn TL with a Creality hotend)
+* Retraction Length: 4.0 (for ID1.9 tubing like Capricorn XS with a Creality hotend and [hotend fix](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
+* Retraction Length: 3.5 (for ID1.9 tubing like Capricorn XS with a Micro Swiss hotend)
 * Retraction Speed: 25
-* Retract on layer change: DISABLE
 * Wipe while retracting: ENABLE
 * Retract amount before wipe: 70
 
