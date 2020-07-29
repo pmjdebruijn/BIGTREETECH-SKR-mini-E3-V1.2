@@ -44,6 +44,9 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 
 ## Important Notes
 
+**CRITICAL:** Extended Y-axis range (12mm beyond bed) is used to increase automated bed levelling
+coverage, and compatibility with third party hot-end shrouds may be reduced.
+
 **CRITICAL:** X/Y Microstepping has been reverted to 16 (resulting in 80 steps/mm again).
 
 **WARNING:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
@@ -76,6 +79,9 @@ Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by 
 
 Power Loss Recovery is builtin, but is as of yet _untested_ and _disabled by default_
 ([`M413 S1`](http://marlinfw.org/docs/gcode/M413.html) G-code).
+
+Assisted Tramming is builtin, but has had limited testing
+([`G35`](https://marlinfw.org/docs/gcode/G035.html) G-code).
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
