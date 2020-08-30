@@ -33,7 +33,7 @@ fi
 if [ ! -d "${CONFIG_DIR}" ]; then
   git clone https://github.com/MarlinFirmware/Configurations ${CONFIG_DIR}
 
-  git -C ${CONFIG_DIR} checkout import-${BRANCH}
+  git -C ${CONFIG_DIR} checkout release-2.0.6.1
 else
   echo "WARNING: Reusing preexisting ${CONFIG_DIR} directory..."
 fi
@@ -61,6 +61,7 @@ git -C ${MARLIN_DIR} reset --hard
 sed -i 's@\[platformio\]@\[platformio\]\ncore_dir = PlatformIO@' ${MARLIN_DIR}/platformio.ini
 
 sed -i 's#[Mm]edia#TF card#g' ${MARLIN_DIR}/Marlin/src/lcd/language/language_en.h
+sed -i 's#SD Init Fail#TF card init fail#g' ${MARLIN_DIR}/Marlin/src/lcd/language/language_en.h
 
 sed -i 's@.*#define CUSTOM_VERSION_FILE.*@&\n#define WEBSITE_URL "www.creality3d.cn"@' ${MARLIN_DIR}/Marlin/Configuration.h
 
@@ -79,6 +80,9 @@ sed -i 's@.*#define LCD_TIMEOUT_TO_STATUS .*@#define LCD_TIMEOUT_TO_STATUS 90000
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 }@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
+sed -i 's@.*#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 1000 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION   1000@' ${MARLIN_DIR}/Marlin/Configuration.h
+
 sed -i 's@.*#define JUNCTION_DEVIATION_MM .*@  #define JUNCTION_DEVIATION_MM 0.04@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 #sed -i 's@.*#define CLASSIC_JERK@#define CLASSIC_JERK@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -90,6 +94,8 @@ sed -i 's@.*#define S_CURVE_ACCELERATION@#define S_CURVE_ACCELERATION@g' ${MARLI
 sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 sed -i 's@.*#define INDIVIDUAL_AXIS_HOMING_MENU@//#define INDIVIDUAL_AXIS_HOMING_MENU@' ${MARLIN_DIR}/Marlin/Configuration.h
+
+
 
 # limit z height
 sed -i 's@#define Z_MAX_POS .*@#define Z_MAX_POS 220@g' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -123,12 +129,13 @@ sed -i 's@.*if (blink \&\& estimation_string@          if (estimation_string@' $
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 25, 175, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define EVENT_GCODE_SD_STOP .*@  #define EVENT_GCODE_SD_STOP "G27 P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define EVENT_GCODE_SD_ABORT .*@  #define EVENT_GCODE_SD_ABORT "G27 P2"@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
 # make sure our Z doesn't drop down
 sed -i 's@.*#define DISABLE_INACTIVE_Z .*@#define DISABLE_INACTIVE_Z false@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define HOME_AFTER_DEACTIVATE@#define HOME_AFTER_DEACTIVATE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -172,6 +179,7 @@ sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@g' ${M
 
 
 # Power Loss Recovery
+sed -i 's@#define SDCARD_READONLY@//#define SDCARD_READONLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define POWER_LOSS_RECOVERY@  #define POWER_LOSS_RECOVERY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define PLR_ENABLED_DEFAULT.*@    #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery disabled by default@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -303,7 +311,7 @@ if [ "${BOARD}" != "melzi" ]; then
 
   # filament runout sensor (but disabled by default)
   sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@g' ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@.*runout.enabled = true@    runout.enabled = false@g' ${MARLIN_DIR}/Marlin/src/module/configuration_store.cpp
+  sed -i 's@.*#define FIL_RUNOUT_ENABLED_DEFAULT .*@  #define FIL_RUNOUT_ENABLED_DEFAULT false@g' ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 

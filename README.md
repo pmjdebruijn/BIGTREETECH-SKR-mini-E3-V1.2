@@ -11,7 +11,8 @@
 > More information available:
 > [here](https://www.youtube.com/watch?v=EBIahC1P2e0),
 > [here](https://www.youtube.com/watch?v=7Utygr71p8s) and
-> [here](https://www.youtube.com/watch?v=q0JEx3uzgSo).
+> [here](https://www.youtube.com/watch?v=q0JEx3uzgSo) and
+> [here](https://www.youtube.com/watch?v=FgIK1-Zj46s&t=1062s).
 >
 > Also make sure to watch:
 > [this](https://www.youtube.com/watch?v=VK_K6fp4BIk) and
