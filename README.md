@@ -1,20 +1,12 @@
 # BigTreeTech SKR-mini-E3 V1.2
 
-> **WARNING:**
-> The firmware.bin supplied in this repository requires the use of the extended
-> 512KB of flash seemingly available on most of these boards. The second
-> 256KB half is that flash is officially out of spec, and therefore maybe
-> possibly more prone to unpredictable failures.
->
 > **USE THIS FIRMWARE AT YOUR OWN PERIL**
 >
-> More information available:
-> [here](https://www.youtube.com/watch?v=EBIahC1P2e0),
-> [here](https://www.youtube.com/watch?v=7Utygr71p8s) and
-> [here](https://www.youtube.com/watch?v=q0JEx3uzgSo) and
-> [here](https://www.youtube.com/watch?v=FgIK1-Zj46s&t=1062s).
+> These firmware builds no longer use the out of spec 512K flash, however, they do use the as of yet non-standard
+> [newlib-nano](https://keithp.com/newlib-nano/) to keep the firmware sizes managable.
+> More info [here](https://github.com/MarlinFirmware/Marlin/issues/19427).
 >
-> Also make sure to watch:
+> Make sure to watch
 > [this](https://www.youtube.com/watch?v=VK_K6fp4BIk) and
 > [this](https://www.youtube.com/watch?v=ckQ9UWlmdVA).
 >
@@ -36,14 +28,16 @@ resulting in sensor-to-nozzle offsets of roughly -43mm, -5mm, -2mm (X, Y, Z).
 compatibility with clone sensors may be reduced.
 
 **INFO:** During print relative Babystepping is now regular absolute Z-Offset, which should making
-dialing in the Z-Offset much easier. Particularly with the embedded Z Calibration PLA print
-available in the Calibration menu.
+dialing in the Z-Offset much easier.
 
 **TIP:** The precompiled firmware.bin was tested using a genuine BLTouch SMART 3.1, if you are
 getting inconsistent behavior, try adjusting the magnet inside the BLTouch using the hexnut
 located in device's top center. Turning the hexnut 90 degrees clockwise fixed it for me.
 
 ## Important Notes
+
+**CRITICAL:** The main tested firmware build is now configured for a Mini BMG extruder,
+which required reversing of the extruder direction.
 
 **CRITICAL:** Extended Y-axis range (12mm beyond bed) is used to increase automated bed levelling
 coverage, and compatibility with third party hot-end shrouds may be reduced.
@@ -58,7 +52,7 @@ accidentally trigger flow rate changes from the status screen.
 
 S-Curve acceleration is enabled.
 
-Junction deviation is builtin and enabled with a more conservative default value.
+Junction deviation has been reverted to traditional Jerk.
 
 Supports remaining times, if enabled in your slicer software
 ([`M73`](http://marlinfw.org/docs/gcode/M073.html) G-code).
@@ -81,9 +75,6 @@ Filament Runout Sensor is builtin, but is as of yet _untested_ and _disabled by 
 Power Loss Recovery is builtin, but is as of yet _untested_ and _disabled by default_
 ([`M413 S1`](http://marlinfw.org/docs/gcode/M413.html) G-code).
 
-Assisted Tramming is builtin, but has had limited testing
-([`G35`](https://marlinfw.org/docs/gcode/G035.html) G-code).
-
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
 Maximum heated-bed temperature has been limited to 80C for increased safety.
@@ -92,13 +83,23 @@ Maximum filename length has been increased.
 
 Hotend is listed as E0 (as opposed to E1) to match Marlin source configuration files.
 
+## Using The Build Script
+
+The build script has been tested on Xubuntu 20.04 LTS, some examples:
+
+```
+bash skr_mini_e3_build.sh skrminie3v12 minibmg bltouch
+bash skr_mini_e3_build.sh skrminie3v12 stock bltouch
+bash skr_mini_e3_build.sh skrminie3v12 stock nobltouch 
+bash skr_mini_e3_build.sh melzi stock nobltouch
+```
+
 ## Initial Setup
 
-After flashing the precompiled firmware.bin, if desired, you should (re-)calibrate 
+After flashing the appropriate compiled firmware.bin, if desired, you should (re-)calibrate 
 your extruder (E-steps) first.
 
-If you value visual quality of your prints over dimensional accuracy, you may want
-to multiply your E-steps by ~0.97, causing slight but intentional underextrusion.
+Then run optionally run Hotend PID autotuning.
 
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
@@ -108,15 +109,9 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 
 ## PrusaSlicer Printer Settings
 
-* Bed shape: 220x220 (-5.5x-5.5)
+* Bed shape: 231x231
 * Max print height: 220
 * Supports remaining times: ENABLE
-* Retraction Length: 6.0 (for ID2.0 tubing like Capricorn TL with a Creality hotend)
-* Retraction Length: 4.0 (for ID1.9 tubing like Capricorn XS with a Creality hotend and [hotend fix](https://www.youtube.com/watch?v=dIkjR2Ytx-g))
-* Retraction Length: 3.5 (for ID1.9 tubing like Capricorn XS with a Micro Swiss hotend)
-* Retraction Speed: 25
-* Wipe while retracting: ENABLE
-* Retract amount before wipe: 70
 
 ## PrusaSlicer Start G-code
 
@@ -137,28 +132,20 @@ M190 S[first_layer_bed_temperature] ; wait for bed temp
 M109 S[first_layer_temperature] ; wait for extruder temp
 
 G1 X2 Y10 Z0.28 F240
-G92 E0
-G1 Y190 E15.0 F1500.0 ; intro line
+G92 E0.0
+G1 Y190 E11.0 F1500.0 ; intro line
 G1 X2.3 F3600
-G1 Y10 E15.0 F1200.0 ; intro line
-G92 E0
+G1 Y10 E11.0 F1200.0 ; intro line
+G92 E0.0
 ```
 
 ## PrusaSlicer End G-code
 
 ```
-G91
-G1 Z1 E-3 F1500 ; release nozzle pressure
-G27 P2
-
-M140 S0 ; turn off heatbed
-
-M104 S[first_layer_temperature] ; raise extruder temp
-G4 S45 ; allow the nozzle to release residual pressure through oozing
-
 M104 S0 ; turn off temperature
-
+M140 S0 ; turn off heatbed
 M107 ; turn off fan
+G27 P2 ; Present print
 M84 X Y E ; disable motors
 ```
 
@@ -167,9 +154,8 @@ M84 X Y E ; disable motors
 - [SKR-mini-E3 V1.2](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
 - [Creality Ender 3 Pro](https://www.creality.com/creality-ender-3-pro-3d-printer-p00251p1.html)
 - [ANTCLABS BLTouch SMART 3.1 with the Creality metal mounting bracket](https://www.antclabs.com/bltouch-v3)
-- [FYSETC All Metal BMG Bowden Extruder](https://aliexpress.com/item/33047017792.html)
+- [TriangleLab Dual Drive Extruder Mini BMG](https://nl.aliexpress.com/item/33029933418.html)
 - [FYSETC Leadscrew Top Mount](https://aliexpress.com/item/33013348068.html)
 - [Micro Swiss All Metal Hotend](https://store.micro-swiss.com/products/all-metal-hotend-kit-for-cr-10)
-- [Micro Swiss MK8 Plated Wear Resistant Nozzle .4mm](https://store.micro-swiss.com/products/mk8)
-- [Capricorn XS Bowden Tubing](https://www.captubes.com/)
+- [Capricorn TL Bowden Tubing](https://www.captubes.com/)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
