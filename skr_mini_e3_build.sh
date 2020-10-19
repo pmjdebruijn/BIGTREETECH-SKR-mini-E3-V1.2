@@ -6,13 +6,18 @@
 #
 
 
+
 VENV_DIR=PlatformIO
 MARLIN_DIR=Marlin
 CONFIG_DIR=Configurations
 CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
-BRANCH=2.0.7.1
+
+SRC_BRANCH=2.0.7.2
+CFG_BRANCH=import-${SRC_BRANCH}
+
+
 
 BOARD=$1
 [ "${BOARD}" == "" ] && BOARD=skrminie3v12 && echo "WARNING: Board not specified, defaulting to '${BOARD}' ..."
@@ -28,6 +33,7 @@ SENSOR=$3
 if [ ! -d "${VENV_DIR}" ]; then
   python3 -m venv ${VENV_DIR}
 
+  ./${VENV_DIR}/bin/pip install -U wheel --no-cache-dir
   ./${VENV_DIR}/bin/pip install -U platformio --no-cache-dir
 else
   echo "WARNING: Reusing preexisting ${VENV_DIR} directory..."
@@ -36,7 +42,7 @@ fi
 if [ ! -d "${CONFIG_DIR}" ]; then
   git clone https://github.com/MarlinFirmware/Configurations ${CONFIG_DIR}
 
-  git -C ${CONFIG_DIR} checkout release-${BRANCH}
+  git -C ${CONFIG_DIR} checkout ${CFG_BRANCH}
 else
   echo "WARNING: Reusing preexisting ${CONFIG_DIR} directory..."
 fi
@@ -44,12 +50,22 @@ fi
 if [ ! -d "${MARLIN_DIR}" ]; then
   git clone https://github.com/MarlinFirmware/Marlin ${MARLIN_DIR}
 
-  git -C ${MARLIN_DIR} checkout ${BRANCH}
+  git -C ${MARLIN_DIR} checkout ${SRC_BRANCH}
+
+  # post 2.0.7.2 - Fix HAL/STM32 FastIO for analog pins (#19735)
+  git -C ${MARLIN_DIR} cherry-pick 86cb0797eb9249ab567e04ea8e1aea53cbe0cd98
+  # post 2.0.7.2 - Handle M410 in the main task (#19752)
+  git -C ${MARLIN_DIR} cherry-pick e370834c35bfc529c4b11441e77e5ce7cdafac67
+  # post 2.0.7.2 - Update Probe Offset Wizard for Color UI (#19742)
+  git -C ${MARLIN_DIR} cherry-pick f74b5a6b9bb1e11b6b3a411bcd990e23598730a4
 
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/Configuration.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/_Statusscreen.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/_Bootscreen.h" "${MARLIN_DIR}/Marlin"
+
+  # post 2.0.7.2 - Workaround for config error
+  sed -i 's@#if IS_ULTIPANEL@#if ENABLED(IS_ULTIPANEL)@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   git -C ${MARLIN_DIR} add Marlin/_Statusscreen.h
   git -C ${MARLIN_DIR} add Marlin/_Bootscreen.h
@@ -58,6 +74,8 @@ if [ ! -d "${MARLIN_DIR}" ]; then
 else
   echo "WARNING: Reusing preexisting ${MARLIN_DIR} directory..."
 fi
+
+
 
 git -C ${MARLIN_DIR} reset --hard
 
@@ -123,11 +141,10 @@ sed -i 's@.*if (blink \&\& estimation_string@          if (estimation_string@' $
 
 
 
-
 # firmware based retraction support
 sed -i 's@.*#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FWRETRACT_AUTORETRACT@  //#define FWRETRACT_AUTORETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 2.9@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 3.3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define RETRACT_RECOVER_FEEDRATE .*@  #define RETRACT_RECOVER_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -162,11 +179,6 @@ sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      90@' ${MARLIN_DIR}/Mar
 
 
 
-# add a little more safety against too cold filament
-#sed -i 's@#define EXTRUDE_MINTEMP .*@#define EXTRUDE_MINTEMP 175@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-
-
 # add a little more safety, limits selectable temp to 15 degrees less
 sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@' ${MARLIN_DIR}/Marlin/Configuration.h
 
@@ -187,6 +199,7 @@ sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@' ${MA
 
 # UNTESTED
 if [ "${BOARD}" == "melzi" ]; then
+
   sed -i 's@default_envs.*=.*@default_envs = melzi_optimized@' ${MARLIN_DIR}/platformio.ini
 
   sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -198,12 +211,14 @@ if [ "${BOARD}" == "melzi" ]; then
   sed -i 's@.*#define SDSORT_USES_RAM .*@    #define SDSORT_USES_RAM    true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_CACHE_NAMES .*@    #define SDSORT_CACHE_NAMES true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_CACHE_VFATS .*@    #define SDSORT_CACHE_VFATS 4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
 fi
 
 
 
 # UNTESTED
 if [ "${BOARD}" == "mksgenl" ]; then
+
   sed -i 's@default_envs.*=.*@default_envs = mega2560@' ${MARLIN_DIR}/platformio.ini
 
   sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_MKS_GEN_L@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -226,6 +241,7 @@ fi
 
 
 if [ "${BOARD}" == "skrminie3v12" ]; then
+
   echo 'Import("env")'                                        > ${MARLIN_DIR}/buildroot/share/PlatformIO/scripts/nanolib.py
   echo 'env.Append(LINKFLAGS=["--specs=nano.specs"])'        >> ${MARLIN_DIR}/buildroot/share/PlatformIO/scripts/nanolib.py
   sed -i 's@  buildroot/share/PlatformIO/scripts/STM32F103RC_SKR_MINI.py@&\n  buildroot/share/PlatformIO/scripts/nanolib.py@' ${MARLIN_DIR}/platformio.ini
@@ -268,7 +284,6 @@ if [ "${BOARD}" == "skrminie3v12" ]; then
 
   sed -i 's@.*#define SDCARD_CONNECTION .*@    #define SDCARD_CONNECTION ONBOARD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-
   # sorting (48k ram)
   sed -i 's@.*#define SDCARD_SORT_ALPHA@  #define SDCARD_SORT_ALPHA@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_LIMIT .*@     #define SDSORT_LIMIT      100@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -276,8 +291,8 @@ if [ "${BOARD}" == "skrminie3v12" ]; then
   sed -i 's@.*#define SDSORT_USES_RAM .*@    #define SDSORT_USES_RAM    true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_CACHE_NAMES .*@    #define SDSORT_CACHE_NAMES true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_CACHE_VFATS .*@    #define SDSORT_CACHE_VFATS 4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-fi
 
+fi
 
 
 
@@ -290,7 +305,7 @@ if [ "${BOARD}" != "melzi" ]; then
   sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              2.9@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              3.3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      470@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -354,7 +369,7 @@ fi
 
 if [ "${EXTRUDER}" == "minibmg" ]; then
   sed -i 's@.*#define INVERT_E0_DIR .*@#define INVERT_E0_DIR false@' ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 141 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 140 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 
 

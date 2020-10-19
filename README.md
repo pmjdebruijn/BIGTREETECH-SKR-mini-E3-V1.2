@@ -88,6 +88,7 @@ Hotend is listed as E0 (as opposed to E1) to match Marlin source configuration f
 The build script has been tested on Xubuntu 20.04 LTS, some examples:
 
 ```
+sudo apt-get install git python3-venv
 bash skr_mini_e3_build.sh skrminie3v12 minibmg bltouch
 bash skr_mini_e3_build.sh skrminie3v12 stock bltouch
 bash skr_mini_e3_build.sh skrminie3v12 stock nobltouch 
