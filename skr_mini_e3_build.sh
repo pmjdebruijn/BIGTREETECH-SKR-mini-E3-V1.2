@@ -15,7 +15,7 @@ CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
 SRC_BRANCH=2.0.7.2
-CFG_BRANCH=import-${SRC_BRANCH}
+CFG_BRANCH=release-${SRC_BRANCH}
 
 
 
@@ -52,8 +52,6 @@ if [ ! -d "${MARLIN_DIR}" ]; then
 
   git -C ${MARLIN_DIR} checkout ${SRC_BRANCH}
 
-  # post 2.0.7.2 - Fix HAL/STM32 FastIO for analog pins (#19735)
-  git -C ${MARLIN_DIR} cherry-pick 86cb0797eb9249ab567e04ea8e1aea53cbe0cd98
   # post 2.0.7.2 - Handle M410 in the main task (#19752)
   git -C ${MARLIN_DIR} cherry-pick e370834c35bfc529c4b11441e77e5ce7cdafac67
   # post 2.0.7.2 - Update Probe Offset Wizard for Color UI (#19742)
@@ -63,9 +61,6 @@ if [ ! -d "${MARLIN_DIR}" ]; then
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/_Statusscreen.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/_Bootscreen.h" "${MARLIN_DIR}/Marlin"
-
-  # post 2.0.7.2 - Workaround for config error
-  sed -i 's@#if IS_ULTIPANEL@#if ENABLED(IS_ULTIPANEL)@g' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   git -C ${MARLIN_DIR} add Marlin/_Statusscreen.h
   git -C ${MARLIN_DIR} add Marlin/_Bootscreen.h
@@ -369,7 +364,7 @@ fi
 
 if [ "${EXTRUDER}" == "minibmg" ]; then
   sed -i 's@.*#define INVERT_E0_DIR .*@#define INVERT_E0_DIR false@' ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 140 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 141 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 
 
