@@ -2,10 +2,6 @@
 
 > **USE THIS FIRMWARE AT YOUR OWN PERIL**
 >
-> These firmware builds no longer use the out of spec 512K flash, however, they do use the as of yet non-standard
-> [newlib-nano](https://keithp.com/newlib-nano/) to keep the firmware sizes managable.
-> More info [here](https://github.com/MarlinFirmware/Marlin/issues/19427).
->
 > Make sure to watch
 > [this](https://www.youtube.com/watch?v=VK_K6fp4BIk) and
 > [this](https://www.youtube.com/watch?v=ckQ9UWlmdVA).
@@ -110,45 +106,9 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 
 ## PrusaSlicer Printer Settings
 
-* Bed shape: 231x231
-* Max print height: 220
-* Supports remaining times: ENABLE
-
-## PrusaSlicer Start G-code
-
-```
-G90 ; use absolute coordinates
-M83 ; extruder relative mode
-
-M104 S150 ; set extruder temp for bed leveling
-M140 S[first_layer_bed_temperature] ; set bed temp
-
-G28 ; home all
-G29 ; auto bed levelling
-
-G1 X2 Y10 Z50 F3000 ; lift nozzle
-
-M104 S[first_layer_temperature] ; set extruder temp
-M190 S[first_layer_bed_temperature] ; wait for bed temp
-M109 S[first_layer_temperature] ; wait for extruder temp
-
-G1 X2 Y10 Z0.28 F240
-G92 E0.0
-G1 Y190 E11.0 F1500.0 ; intro line
-G1 X2.3 F3600
-G1 Y10 E11.0 F1200.0 ; intro line
-G92 E0.0
-```
-
-## PrusaSlicer End G-code
-
-```
-M104 S0 ; turn off temperature
-M140 S0 ; turn off heatbed
-M107 ; turn off fan
-G27 P2 ; Present print
-M84 X Y E ; disable motors
-```
+* Select 'Ender-3 BLTouch' from the Configuration Wizard in PrusaSlicer 2.3
+* Change Max print height: 220
+* Change Supports remaining times: ENABLE
 
 ## Reference platform
 

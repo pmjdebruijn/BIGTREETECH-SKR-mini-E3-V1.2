@@ -14,8 +14,8 @@ CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
 
-SRC_BRANCH=2.0.7.2
-CFG_BRANCH=release-${SRC_BRANCH}
+SRC_BRANCH=3404cb1fc4eced0f608cdea4e752e20daf9f9112 #bugfix-2.0.x
+CFG_BRANCH=c92c1b844e3e9fa0646176681f908c2ea4a904c7 #import-2.0.x
 
 
 
@@ -52,11 +52,6 @@ if [ ! -d "${MARLIN_DIR}" ]; then
 
   git -C ${MARLIN_DIR} checkout ${SRC_BRANCH}
 
-  # post 2.0.7.2 - Handle M410 in the main task (#19752)
-  git -C ${MARLIN_DIR} cherry-pick e370834c35bfc529c4b11441e77e5ce7cdafac67
-  # post 2.0.7.2 - Update Probe Offset Wizard for Color UI (#19742)
-  git -C ${MARLIN_DIR} cherry-pick f74b5a6b9bb1e11b6b3a411bcd990e23598730a4
-
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/Configuration.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/Configuration_adv.h" "${MARLIN_DIR}/Marlin"
   cp "${CONFIG_DIR}/config/examples/${CONFIG_BASE}/_Statusscreen.h" "${MARLIN_DIR}/Marlin"
@@ -74,6 +69,8 @@ fi
 
 git -C ${MARLIN_DIR} reset --hard
 
+
+
 sed -i 's@[Mm]edia@TF card@g' ${MARLIN_DIR}/Marlin/src/lcd/language/language_en.h
 sed -i 's@SD Init Fail@TF card init fail@g' ${MARLIN_DIR}/Marlin/src/lcd/language/language_en.h
 
@@ -84,12 +81,10 @@ sed -i 's@.*#define CUSTOM_VERSION_FILE.*@&\n#define WEBSITE_URL "www.creality3d
 sed -i 's@#define STRING_CONFIG_H_AUTHOR .*@#define STRING_CONFIG_H_AUTHOR "Ender-3 Pro"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define CUSTOM_MACHINE_NAME .*@#define CUSTOM_MACHINE_NAME "Ender-3 Pro"@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define EXPECTED_PRINTER_CHECK@#define EXPECTED_PRINTER_CHECK@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
 sed -i 's@.*#define MACHINE_UUID .*@#define MACHINE_UUID "0c0f870d-9d03-4bed-b217-9195f1f3941e"@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define BOOTSCREEN_TIMEOUT .*@#define BOOTSCREEN_TIMEOUT 1000@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@show_marlin_bootscreen();@//show_marlin_bootscreen();@' ${MARLIN_DIR}/Marlin/src/lcd/dogm/ultralcd_DOGM.cpp
+sed -i 's@show_marlin_bootscreen();@//show_marlin_bootscreen();@' ${MARLIN_DIR}/Marlin/src/lcd/dogm/marlinui_DOGM.cpp
 
 sed -i 's@.*#define LCD_TIMEOUT_TO_STATUS .*@#define LCD_TIMEOUT_TO_STATUS 90000@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -118,12 +113,14 @@ sed -i 's@#define Y_BED_SIZE .*@#define Y_BED_SIZE 231@' ${MARLIN_DIR}/Marlin/Co
 
 sed -i 's@.*#define NO_WORKSPACE_OFFSETS@#define NO_WORKSPACE_OFFSETS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
+# faster Z manual move
+sed -i 's@#define MANUAL_FEEDRATE .*@#define MANUAL_FEEDRATE { 50*60, 50*60, 10*60, 2*60 }@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
+# align to half step
+sed -i 's@#define SHORT_MANUAL_Z_MOVE .*@#define SHORT_MANUAL_Z_MOVE 0.02@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # beware https://github.com/MarlinFirmware/Marlin/pull/16143
 sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-
 
 # lcd tweaks
 sed -i '$ a #define NUMBER_TOOLS_FROM_0' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -134,70 +131,55 @@ sed -i 's@.*#define SHOW_REMAINING_TIME@  #define SHOW_REMAINING_TIME@' ${MARLIN
 sed -i 's@.*#define USE_M73_REMAINING_TIME@    #define USE_M73_REMAINING_TIME@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*if (blink \&\& estimation_string@          if (estimation_string@' ${MARLIN_DIR}/Marlin/src/lcd/dogm/status_screen_DOGM.cpp
 
-
-
 # firmware based retraction support
 sed -i 's@.*#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FWRETRACT_AUTORETRACT@  //#define FWRETRACT_AUTORETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 3.3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define RETRACT_RECOVER_FEEDRATE .*@  #define RETRACT_RECOVER_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-
 
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 40, 170, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define EVENT_GCODE_SD_ABORT .*@  #define EVENT_GCODE_SD_ABORT "G27 P2"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-
-
 # make sure our Z doesn't drop down
 sed -i 's@.*#define DISABLE_INACTIVE_Z .*@#define DISABLE_INACTIVE_Z false@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-
 
 # prevent filament cooking
 sed -i 's@.*#define HOTEND_IDLE_TIMEOUT@#define HOTEND_IDLE_TIMEOUT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define HOTEND_IDLE_MIN_TRIGGER .*@  #define HOTEND_IDLE_MIN_TRIGGER   170@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define CONTROLLERFAN_IDLE_TIME .*@  #define CONTROLLERFAN_IDLE_TIME (5*60)@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-
-
 # make sure bed pid temp remains disabled, to keep compatibility with flex-steel pei
 sed -i 's@.*#define PIDTEMPBED@//#define PIDTEMPBED@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-
 
 # add a little more safety, limits selectable temp to 10 degrees less
 sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      90@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-
-
 # add a little more safety, limits selectable temp to 15 degrees less
 sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-
 
 # modernize pla preset
 sed -i 's@#define PREHEAT_1_TEMP_HOTEND .*@#define PREHEAT_1_TEMP_HOTEND 200@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define PREHEAT_1_TEMP_BED .*@#define PREHEAT_1_TEMP_BED     60@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-
 
 # change abs preset to petg
 sed -i 's@#define PREHEAT_2_LABEL .*@#define PREHEAT_2_LABEL       "PETG"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define PREHEAT_2_TEMP_HOTEND .*@#define PREHEAT_2_TEMP_HOTEND 240@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@' ${MARLIN_DIR}/Marlin/Configuration.h
 
+# convenience
+sed -i 's@/*#define BROWSE_MEDIA_ON_INSERT@#define BROWSE_MEDIA_ON_INSERT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+# disable arc support to save space
+sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
-# UNTESTED
+
 if [ "${BOARD}" == "melzi" ]; then
 
   sed -i 's@default_envs.*=.*@default_envs = melzi_optimized@' ${MARLIN_DIR}/platformio.ini
-
-  sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   # sorting (16k ram)
   sed -i 's@.*#define SDCARD_SORT_ALPHA@  #define SDCARD_SORT_ALPHA@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -211,7 +193,6 @@ fi
 
 
 
-# UNTESTED
 if [ "${BOARD}" == "mksgenl" ]; then
 
   sed -i 's@default_envs.*=.*@default_envs = mega2560@' ${MARLIN_DIR}/platformio.ini
@@ -237,10 +218,6 @@ fi
 
 if [ "${BOARD}" == "skrminie3v12" ]; then
 
-  echo 'Import("env")'                                        > ${MARLIN_DIR}/buildroot/share/PlatformIO/scripts/nanolib.py
-  echo 'env.Append(LINKFLAGS=["--specs=nano.specs"])'        >> ${MARLIN_DIR}/buildroot/share/PlatformIO/scripts/nanolib.py
-  sed -i 's@  buildroot/share/PlatformIO/scripts/STM32F103RC_SKR_MINI.py@&\n  buildroot/share/PlatformIO/scripts/nanolib.py@' ${MARLIN_DIR}/platformio.ini
-
   sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_btt@' ${MARLIN_DIR}/platformio.ini
 
   sed -i 's@#define SERIAL_PORT .*@#define SERIAL_PORT 2@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -258,7 +235,6 @@ if [ "${BOARD}" == "skrminie3v12" ]; then
   sed -i 's@/*#define Z_DRIVER_TYPE .*@#define Z_DRIVER_TYPE  TMC2209@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@/*#define E0_DRIVER_TYPE .*@#define E0_DRIVER_TYPE TMC2209@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-  # tmc stepper driver hybrid stealthchop/spreadcycle
   sed -i 's@.*#define MONITOR_DRIVER_STATUS@  #define MONITOR_DRIVER_STATUS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   sed -i 's@.*#define ADAPTIVE_STEP_SMOOTHING@#define ADAPTIVE_STEP_SMOOTHING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -294,27 +270,26 @@ fi
 if [ "${BOARD}" != "melzi" ]; then
 
   sed -i 's@.*#define LONG_FILENAME_HOST_SUPPORT@  #define LONG_FILENAME_HOST_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define ARC_SUPPORT@#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   # advanced pause (for multicolor)
   sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              3.3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      470@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_LENGTH .*@  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   370@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define ADVANCED_PAUSE_PURGE_LENGTH .*@  #define ADVANCED_PAUSE_PURGE_LENGTH        100@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define ADVANCED_PAUSE_PURGE_LENGTH .*@  #define ADVANCED_PAUSE_PURGE_LENGTH        150@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define FILAMENT_UNLOAD_PURGE_LENGTH .*@  #define FILAMENT_UNLOAD_PURGE_LENGTH         4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define PARK_HEAD_ON_PAUSE@  #define PARK_HEAD_ON_PAUSE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_GCODES@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
 
   # filament runout sensor (but disabled by default)
   sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@.*#define FIL_RUNOUT_ENABLED_DEFAULT .*@  #define FIL_RUNOUT_ENABLED_DEFAULT false@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-  # Power Loss Recovery
+  # Power Loss Recovery (but disabled by default)
   sed -i 's@#define SDCARD_READONLY@//#define SDCARD_READONLY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define POWER_LOSS_RECOVERY@  #define POWER_LOSS_RECOVERY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define PLR_ENABLED_DEFAULT.*@    #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery disabled by default@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -334,14 +309,15 @@ if [ "${BOARD}" != "melzi" ]; then
     sed -i 's@/*#define NOZZLE_TO_PROBE_OFFSET .*@#define NOZZLE_TO_PROBE_OFFSET { -43, -5, 0 }@' ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i 's@/*#define PROBING_MARGIN .*@#define PROBING_MARGIN 31@' ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i 's@/*#define EXTRAPOLATE_BEYOND_GRID@#define EXTRAPOLATE_BEYOND_GRID@' ${MARLIN_DIR}/Marlin/Configuration.h
-    sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z  4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i 's@/*#define BABYSTEP_MILLIMETER_UNITS@#define BABYSTEP_MILLIMETER_UNITS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i 's@.*#define BABYSTEP_MULTIPLICATOR_Z .*@  #define BABYSTEP_MULTIPLICATOR_Z  0.01@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define BABYSTEP_DISPLAY_TOTAL@  #define BABYSTEP_DISPLAY_TOTAL@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define BABYSTEP_ZPROBE_OFFSET@  #define BABYSTEP_ZPROBE_OFFSET@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define BABYSTEP_ZPROBE_GFX_OVERLAY@    #define BABYSTEP_ZPROBE_GFX_OVERLAY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     sed -i 's@.*#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 9000@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-    sed -i 's@.*#define HOMING_FEEDRATE_Z .*@#define HOMING_FEEDRATE_Z  (16*60)@' ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i 's@.*#define HOMING_FEEDRATE_Z .*@#define HOMING_FEEDRATE_Z  (10*60)@' ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i 's@.*#define BLTOUCH_HS_MODE@  #define BLTOUCH_HS_MODE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     sed -i 's@.*#define Z_CLEARANCE_DEPLOY_PROBE .*@#define Z_CLEARANCE_DEPLOY_PROBE   10@' ${MARLIN_DIR}/Marlin/Configuration.h
