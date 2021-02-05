@@ -14,8 +14,8 @@ CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
 
-SRC_BRANCH=3404cb1fc4eced0f608cdea4e752e20daf9f9112 #bugfix-2.0.x
-CFG_BRANCH=c92c1b844e3e9fa0646176681f908c2ea4a904c7 #import-2.0.x
+SRC_BRANCH=8f7bac49992c6df83f98bf25fc28caa8a2edde12 # from bugfix-2.0.x
+CFG_BRANCH=b92c0f2ebfc6b6f22951618683730a2ba9a483c5 # from import-2.0.x
 
 
 
@@ -91,7 +91,6 @@ sed -i 's@.*#define LCD_TIMEOUT_TO_STATUS .*@#define LCD_TIMEOUT_TO_STATUS 90000
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define DEFAULT_MAX_ACCELERATION .*@#define DEFAULT_MAX_ACCELERATION      { 500, 500, 100, 1000 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION   1000@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define CLASSIC_JERK@#define CLASSIC_JERK@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -117,7 +116,7 @@ sed -i 's@.*#define NO_WORKSPACE_OFFSETS@#define NO_WORKSPACE_OFFSETS@' ${MARLIN
 sed -i 's@#define MANUAL_FEEDRATE .*@#define MANUAL_FEEDRATE { 50*60, 50*60, 10*60, 2*60 }@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # align to half step
-sed -i 's@#define SHORT_MANUAL_Z_MOVE .*@#define SHORT_MANUAL_Z_MOVE 0.02@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@#define FINE_MANUAL_MOVE .*@#define FINE_MANUAL_MOVE 0.02@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # beware https://github.com/MarlinFirmware/Marlin/pull/16143
 sed -i 's@.*#define SD_CHECK_AND_RETRY@#define SD_CHECK_AND_RETRY@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -134,14 +133,14 @@ sed -i 's@.*if (blink \&\& estimation_string@          if (estimation_string@' $
 # firmware based retraction support
 sed -i 's@.*#define FWRETRACT@#define FWRETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 sed -i 's@.*#define FWRETRACT_AUTORETRACT@  //#define FWRETRACT_AUTORETRACT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-sed -i 's@.*#define RETRACT_RECOVER_FEEDRATE .*@  #define RETRACT_RECOVER_FEEDRATE 25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_LENGTH .*@  #define RETRACT_LENGTH 2@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_FEEDRATE .*@  #define RETRACT_FEEDRATE 70@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define RETRACT_RECOVER_FEEDRATE .*@  #define RETRACT_RECOVER_FEEDRATE 40@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 40, 170, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define EVENT_GCODE_SD_ABORT .*@  #define EVENT_GCODE_SD_ABORT "G27 P2"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@.*#define EVENT_GCODE_SD_ABORT .*@  #define EVENT_GCODE_SD_ABORT "G27P2"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # make sure our Z doesn't drop down
 sed -i 's@.*#define DISABLE_INACTIVE_Z .*@#define DISABLE_INACTIVE_Z false@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -155,25 +154,37 @@ sed -i 's@.*#define CONTROLLERFAN_IDLE_TIME .*@  #define CONTROLLERFAN_IDLE_TIME
 sed -i 's@.*#define PIDTEMPBED@//#define PIDTEMPBED@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # add a little more safety, limits selectable temp to 10 degrees less
-sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      90@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      100@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # add a little more safety, limits selectable temp to 15 degrees less
 sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # modernize pla preset
+sed -i 's@#define PREHEAT_1_LABEL .*@#define PREHEAT_1_LABEL       "PLA"@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define PREHEAT_1_TEMP_HOTEND .*@#define PREHEAT_1_TEMP_HOTEND 200@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@#define PREHEAT_1_TEMP_BED .*@#define PREHEAT_1_TEMP_BED     60@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-# change abs preset to petg
-sed -i 's@#define PREHEAT_2_LABEL .*@#define PREHEAT_2_LABEL       "PETG"@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define PREHEAT_2_TEMP_HOTEND .*@#define PREHEAT_2_TEMP_HOTEND 240@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     70@' ${MARLIN_DIR}/Marlin/Configuration.h
+# change abs preset to htpla
+sed -i 's@#define PREHEAT_2_LABEL .*@#define PREHEAT_2_LABEL       "HT PLA"@' ${MARLIN_DIR}/Marlin/Configuration.h
+
+sed -i 's@#define PREHEAT_2_TEMP_HOTEND .*@#define PREHEAT_2_TEMP_HOTEND 215@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     60@' ${MARLIN_DIR}/Marlin/Configuration.h
+
+# add petg preset
+sed -i 's@.*#define PREHEAT_2_FAN_SPEED.*@&\n\n#define PREHEAT_3_LABEL       "PETG"\n#define PREHEAT_3_TEMP_HOTEND 240\n#define PREHEAT_3_TEMP_BED     70\n#define PREHEAT_3_FAN_SPEED   127@' Marlin/Marlin/Configuration.h
+
+# add abs preset
+sed -i 's@.*#define PREHEAT_3_FAN_SPEED.*@&\n\n#define PREHEAT_4_LABEL       "ABS"\n#define PREHEAT_4_TEMP_HOTEND 240\n#define PREHEAT_4_TEMP_BED     90\n#define PREHEAT_4_FAN_SPEED   0@' Marlin/Marlin/Configuration.h
 
 # convenience
 sed -i 's@/*#define BROWSE_MEDIA_ON_INSERT@#define BROWSE_MEDIA_ON_INSERT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-# disable arc support to save space
-sed -i 's@.*#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+# keep arc support
+sed -i 's@.*#define ARC_SUPPORT@#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+# OctoPrint support
+sed -i 's@/*#define HOST_ACTION_COMMANDS@#define HOST_ACTION_COMMANDS@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+sed -i 's@/*#define HOST_PROMPT_SUPPORT@#define HOST_PROMPT_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 
 
@@ -187,7 +198,10 @@ if [ "${BOARD}" == "melzi" ]; then
   sed -i 's@.*#define FOLDER_SORTING .*@     #define FOLDER_SORTING     1@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_USES_RAM .*@    #define SDSORT_USES_RAM    true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define SDSORT_CACHE_NAMES .*@    #define SDSORT_CACHE_NAMES true@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define SDSORT_CACHE_VFATS .*@    #define SDSORT_CACHE_VFATS 4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define SDSORT_CACHE_VFATS .*@    #define SDSORT_CACHE_VFATS 5@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+  # remove arc support to save space
+  sed -i 's@#define ARC_SUPPORT@//#define ARC_SUPPORT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 fi
 
@@ -240,12 +254,10 @@ if [ "${BOARD}" == "skrminie3v12" ]; then
   sed -i 's@.*#define ADAPTIVE_STEP_SMOOTHING@#define ADAPTIVE_STEP_SMOOTHING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   sed -i 's@.*#define HYBRID_THRESHOLD@  #define HYBRID_THRESHOLD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     150@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     150@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define Z_HYBRID_THRESHOLD .*@  #define Z_HYBRID_THRESHOLD      10@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define E0_HYBRID_THRESHOLD .*@  #define E0_HYBRID_THRESHOLD     10@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-  sed -i 's@.*#define TMC_DEBUG@  #define TMC_DEBUG@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define X_HYBRID_THRESHOLD .*@  #define X_HYBRID_THRESHOLD     152@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define Y_HYBRID_THRESHOLD .*@  #define Y_HYBRID_THRESHOLD     152@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define Z_HYBRID_THRESHOLD .*@  #define Z_HYBRID_THRESHOLD      12@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define E0_HYBRID_THRESHOLD .*@  #define E0_HYBRID_THRESHOLD     12@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   sed -i 's@.*#define SQUARE_WAVE_STEPPING@  #define SQUARE_WAVE_STEPPING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -274,8 +286,8 @@ if [ "${BOARD}" != "melzi" ]; then
   # advanced pause (for multicolor)
   sed -i 's@.*#define EXTRUDE_MAXLENGTH .*@#define EXTRUDE_MAXLENGTH 500@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@.*#define ADVANCED_PAUSE_FEATURE@#define ADVANCED_PAUSE_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         25@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              3@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define PAUSE_PARK_RETRACT_FEEDRATE .*@  #define PAUSE_PARK_RETRACT_FEEDRATE         40@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define PAUSE_PARK_RETRACT_LENGTH .*@  #define PAUSE_PARK_RETRACT_LENGTH              2@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_UNLOAD_LENGTH .*@  #define FILAMENT_CHANGE_UNLOAD_LENGTH      470@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE .*@  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  15@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -284,6 +296,9 @@ if [ "${BOARD}" != "melzi" ]; then
   sed -i 's@.*#define FILAMENT_UNLOAD_PURGE_LENGTH .*@  #define FILAMENT_UNLOAD_PURGE_LENGTH         4@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define PARK_HEAD_ON_PAUSE@  #define PARK_HEAD_ON_PAUSE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define FILAMENT_LOAD_UNLOAD_GCODES@  #define FILAMENT_LOAD_UNLOAD_GCODES@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+
+  # fix M25/M125 alias
+  sed -i "s@parser.boolval('P')@parser.boolval('P', true)@" ${MARLIN_DIR}/Marlin/src/gcode/feature/pause/M125.cpp
 
   # filament runout sensor (but disabled by default)
   sed -i 's@.*#define FILAMENT_RUNOUT_SENSOR@#define FILAMENT_RUNOUT_SENSOR@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -315,9 +330,11 @@ if [ "${BOARD}" != "melzi" ]; then
     sed -i 's@.*#define BABYSTEP_ZPROBE_OFFSET@  #define BABYSTEP_ZPROBE_OFFSET@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define BABYSTEP_ZPROBE_GFX_OVERLAY@    #define BABYSTEP_ZPROBE_GFX_OVERLAY@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
+    sed -i 's@.*#define HOMING_FEEDRATE_MM_M .*@#define HOMING_FEEDRATE_MM_M { (20*60), (20*60), (10*60) }@' ${MARLIN_DIR}/Marlin/Configuration.h
     sed -i 's@.*#define XY_PROBE_SPEED .*@#define XY_PROBE_SPEED 9000@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-    sed -i 's@.*#define HOMING_FEEDRATE_Z .*@#define HOMING_FEEDRATE_Z  (10*60)@' ${MARLIN_DIR}/Marlin/Configuration.h
+    sed -i 's@.*#define Z_PROBE_SPEED_FAST .*@#define Z_PROBE_SPEED_FAST (10*60)@' ${MARLIN_DIR}/Marlin/Configuration.h
+
     sed -i 's@.*#define BLTOUCH_HS_MODE@  #define BLTOUCH_HS_MODE@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     sed -i 's@.*#define Z_CLEARANCE_DEPLOY_PROBE .*@#define Z_CLEARANCE_DEPLOY_PROBE   10@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -340,7 +357,7 @@ fi
 
 if [ "${EXTRUDER}" == "minibmg" ]; then
   sed -i 's@.*#define INVERT_E0_DIR .*@#define INVERT_E0_DIR false@' ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 141 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 140 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 fi
 
 

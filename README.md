@@ -109,14 +109,16 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 * Select 'Ender-3 BLTouch' from the Configuration Wizard in PrusaSlicer 2.3
 * Change Max print height: 220
 * Change Supports remaining times: ENABLE
+* Change Pause Print G-code to: M125 P1
 
 ## Reference platform
 
-- [SKR-mini-E3 V1.2](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
 - [Creality Ender 3 Pro](https://www.creality.com/creality-ender-3-pro-3d-printer-p00251p1.html)
+- [SKR-mini-E3 V1.2](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
 - [ANTCLABS BLTouch SMART 3.1 with the Creality metal mounting bracket](https://www.antclabs.com/bltouch-v3)
 - [TriangleLab Dual Drive Extruder Mini BMG](https://nl.aliexpress.com/item/33029933418.html)
 - [FYSETC Leadscrew Top Mount](https://aliexpress.com/item/33013348068.html)
 - [Micro Swiss All Metal Hotend](https://store.micro-swiss.com/products/all-metal-hotend-kit-for-cr-10)
-- [Capricorn TL Bowden Tubing](https://www.captubes.com/)
+- [TriangleLab MK8 Plated Nozzle] (https://nl.aliexpress.com/item/4000007458595.html)
+- [TriangleLab PTFE ID1.9 Tubing](https://nl.aliexpress.com/item/32948036538.html)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
