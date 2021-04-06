@@ -34,14 +34,16 @@ located in device's top center. Turning the hexnut 90 degrees clockwise fixed it
 
 **CRITICAL:** The main tested firmware build is now configured for a Mini BMG extruder,
 which required reversing of the extruder direction.
+There is an untested firmware build available for the stock extruder.
 
 **CRITICAL:** Extended Y-axis range (12mm beyond bed) is used to increase automated bed levelling
 coverage, and compatibility with third party hot-end shrouds may be reduced.
 
-**CRITICAL:** X/Y Microstepping has been reverted to 16 (resulting in 80 steps/mm again).
+**CRITICAL:** X/Y Microstepping has been reverted to the standard 16 (resulting in 80 steps/mm again).
 
-**WARNING:** `Z_MAX_POS` has been limited to 220 to account for thicker print beds,
-a BMG style extruder upgrade and a leadscrew top mount upgrade.
+**WARNING:** `Z_MAX_POS` has been limited to 240.
+
+The status screen update rate has been increased to make it slightly more responsive.
 
 The status screen flow rate deadzone has been increased, so it's more difficult to
 accidentally trigger flow rate changes from the status screen.
@@ -55,9 +57,6 @@ Supports remaining times, if enabled in your slicer software
 
 Nozzle Park is builtin
 (you can use [`G27 P2`](http://marlinfw.org/docs/gcode/G027.html) in your print end G-code).
-
-Trinamic StealthChop/SpreadCycle hybrid threshold is enabled
-([`M913`](http://marlinfw.org/docs/gcode/M913.html) G-code).
 
 Load/Unload Filament is builtin.
 ([`M702`](http://marlinfw.org/docs/gcode/M702.html) G-code).
@@ -73,11 +72,17 @@ Power Loss Recovery is builtin, but is as of yet _untested_ and _disabled by def
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
-Maximum heated-bed temperature has been limited to 80C for increased safety.
+Maximum heated-bed temperature has been limited to 90C for increased safety.
+
+The heated-bed check interval has been lowered to 1000ms for a more consistent bed temperature.
 
 Maximum filename length has been increased.
 
 Hotend is listed as E0 (as opposed to E1) to match Marlin source configuration files.
+
+PID tuning initiated via the menu does 9 cycles as opposed to merely 5, so it will take longer.
+
+Some Builtin G-codes are avaible at the bottom of the Configuration menu.
 
 ## Using The Build Script
 
@@ -96,7 +101,7 @@ bash skr_mini_e3_build.sh melzi stock nobltouch
 After flashing the appropriate compiled firmware.bin, if desired, you should (re-)calibrate 
 your extruder (E-steps) first.
 
-Then run optionally run Hotend PID autotuning.
+Then run Hotend PID tuning.
 
 Next do a _bed level corners_, using a ~200gsm (~0.25mm) thick piece of paper.
 
@@ -106,8 +111,8 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 
 ## PrusaSlicer Printer Settings
 
-* Select 'Ender-3 BLTouch' from the Configuration Wizard in PrusaSlicer 2.3
-* Change Max print height: 220
+* Select 'Ender-3 BLTouch' from the Configuration Wizard in PrusaSlicer 2.3+
+* Change Max print height: 240
 * Change Supports remaining times: ENABLE
 * Change Pause Print G-code to: M125 P1
 
@@ -117,8 +122,8 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 - [SKR-mini-E3 V1.2](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
 - [ANTCLABS BLTouch SMART 3.1 with the Creality metal mounting bracket](https://www.antclabs.com/bltouch-v3)
 - [TriangleLab Dual Drive Extruder Mini BMG](https://nl.aliexpress.com/item/33029933418.html)
-- [FYSETC Leadscrew Top Mount](https://aliexpress.com/item/33013348068.html)
 - [Micro Swiss All Metal Hotend](https://store.micro-swiss.com/products/all-metal-hotend-kit-for-cr-10)
-- [TriangleLab MK8 Plated Nozzle] (https://nl.aliexpress.com/item/4000007458595.html)
+- [TriangleLab MK8 Plated Nozzle](https://nl.aliexpress.com/item/4000007458595.html)
 - [TriangleLab PTFE ID1.9 Tubing](https://nl.aliexpress.com/item/32948036538.html)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
+- [Cooling Fan Duct](https://www.thingiverse.com/thing:3437925)
