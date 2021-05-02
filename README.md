@@ -12,6 +12,8 @@
 
 ## BLTouch (__REQUIRED__)
 
+**CRITICAL:** X/Y Microstepping has been increased to 32 (resulting in 160 steps/mm).
+
 **CRITICAL:** The BLTouch bed levelling sensor should be connected to the `PROBE` (and `SERVO`) headers,
 and triple check the actual pinouts before powering on the board.
 
@@ -72,7 +74,7 @@ Power Loss Recovery is builtin, but is as of yet _untested_ and _disabled by def
 
 Maximum hot-end temperature has been limited to 250C for increased safety.
 
-Maximum heated-bed temperature has been limited to 90C for increased safety.
+Maximum heated-bed temperature has been limited to 100C for increased safety.
 
 The heated-bed check interval has been lowered to 1000ms for a more consistent bed temperature.
 
@@ -121,9 +123,9 @@ bed adhesion, in my particular case I ended up somewhere around -2.00mm
 - [Creality Ender 3 Pro](https://www.creality.com/creality-ender-3-pro-3d-printer-p00251p1.html)
 - [SKR-mini-E3 V1.2](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
 - [ANTCLABS BLTouch SMART 3.1 with the Creality metal mounting bracket](https://www.antclabs.com/bltouch-v3)
-- [TriangleLab Dual Drive Extruder Mini BMG](https://nl.aliexpress.com/item/33029933418.html)
 - [Micro Swiss All Metal Hotend](https://store.micro-swiss.com/products/all-metal-hotend-kit-for-cr-10)
-- [TriangleLab MK8 Plated Nozzle](https://nl.aliexpress.com/item/4000007458595.html)
+- [Micro Swiss MK8 Plated Wear Resistant Nozzle](https://store.micro-swiss.com/collections/nozzles/products/mk8)
+- [TriangleLab Dual Drive Extruder Mini BMG](https://nl.aliexpress.com/item/33029933418.html)
 - [TriangleLab PTFE ID1.9 Tubing](https://nl.aliexpress.com/item/32948036538.html)
 - [FlexPlate PEI Print Surface](https://primacreator.com/products/primacreator-flexplate-pei)
-- [Cooling Fan Duct](https://www.thingiverse.com/thing:3437925)
+- [Ender 3 EZ Vent Remix (via Shapeways)](https://www.thingiverse.com/thing:3864519) 

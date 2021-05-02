@@ -14,8 +14,8 @@ CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
 
-SRC_BRANCH=b483a8d652c18626d57b5a38c78fdd2caa6e91c3 # from bugfix-2.0.x
-CFG_BRANCH=232e16029a937b6912e5b9674840163b21c73f87 # from import-2.0.x
+SRC_BRANCH=64a7dfbe7d76a4d05663e597fbaeeecb95069a66 # from 2.0.x
+CFG_BRANCH=99442f5efb1e8067d219947615ab0f1f5edd15f0 # from release-2.0.8
 
 
 
@@ -27,6 +27,13 @@ EXTRUDER=$2
 
 SENSOR=$3
 [ "${SENSOR}" == "" ] && SENSOR=bltouch && echo "WARNING: Sensor not specified, defaulting to '${SENSOR}' ..."
+
+
+
+X_STEPS=80
+Y_STEPS=80
+Z_STEPS=400
+E_STEPS=93
 
 
 
@@ -147,11 +154,9 @@ sed -i 's@.*#define LCD_TIMEOUT_TO_STATUS .*@  #define LCD_TIMEOUT_TO_STATUS 900
 sed -i 's@.*#define LEVEL_BED_CORNERS@#define LEVEL_BED_CORNERS@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define LEVEL_CORNERS_INSET.*@  #define LEVEL_CORNERS_INSET_LFRB { 31, 31, 31, 31 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define DEFAULT_TRAVEL_ACCELERATION .*@#define DEFAULT_TRAVEL_ACCELERATION   1000@' ${MARLIN_DIR}/Marlin/Configuration.h
-
 sed -i 's@.*#define CLASSIC_JERK@#define CLASSIC_JERK@' ${MARLIN_DIR}/Marlin/Configuration.h
 
-sed -i 's@.*#define S_CURVE_ACCELERATION@#define S_CURVE_ACCELERATION@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define S_CURVE_ACCELERATION@//#define S_CURVE_ACCELERATION@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 sed -i 's@.*#define INDIVIDUAL_AXIS_HOMING_MENU@//#define INDIVIDUAL_AXIS_HOMING_MENU@' ${MARLIN_DIR}/Marlin/Configuration.h
 
@@ -196,7 +201,7 @@ sed -i 's@.*#define RETRACT_RECOVER_FEEDRATE .*@  #define RETRACT_RECOVER_FEEDRA
 
 # nozzle parking
 sed -i 's@.*#define NOZZLE_PARK_FEATURE@#define NOZZLE_PARK_FEATURE@' ${MARLIN_DIR}/Marlin/Configuration.h
-sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 40, 170, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@.*#define NOZZLE_PARK_POINT .*@  #define NOZZLE_PARK_POINT { 40, 200, 100 }@' ${MARLIN_DIR}/Marlin/Configuration.h
 sed -i 's@.*#define EVENT_GCODE_SD_ABORT .*@  #define EVENT_GCODE_SD_ABORT "G27P2"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
 # make sure our Z doesn't drop down
@@ -214,7 +219,7 @@ sed -i 's@M303 U1 E%i S%i@M303 U1 E%i C9 S%i@' ${MARLIN_DIR}/Marlin/src/lcd/menu
 sed -i 's@.*#define PIDTEMPBED@//#define PIDTEMPBED@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # add a little more safety, limits selectable temp to 10 degrees less
-sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      100@' ${MARLIN_DIR}/Marlin/Configuration.h
+sed -i 's@#define BED_MAXTEMP .*@#define BED_MAXTEMP      110@' ${MARLIN_DIR}/Marlin/Configuration.h
 
 # add a little more safety, limits selectable temp to 15 degrees less
 sed -i 's@#define HEATER_0_MAXTEMP 275@#define HEATER_0_MAXTEMP 265@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -234,7 +239,7 @@ sed -i 's@#define PREHEAT_2_TEMP_BED .*@#define PREHEAT_2_TEMP_BED     60@' ${MA
 sed -i 's@.*#define PREHEAT_2_FAN_SPEED.*@&\n\n#define PREHEAT_3_LABEL       "PETG"\n#define PREHEAT_3_TEMP_HOTEND 240\n#define PREHEAT_3_TEMP_BED     70\n#define PREHEAT_3_TEMP_CHAMBER 35\n#define PREHEAT_3_FAN_SPEED   127@' Marlin/Marlin/Configuration.h
 
 # add abs preset
-sed -i 's@.*#define PREHEAT_3_FAN_SPEED.*@&\n\n#define PREHEAT_4_LABEL       "ABS"\n#define PREHEAT_4_TEMP_HOTEND 240\n#define PREHEAT_4_TEMP_BED     90\n#define PREHEAT_4_TEMP_CHAMBER 35\n#define PREHEAT_4_FAN_SPEED     0@' Marlin/Marlin/Configuration.h
+sed -i 's@.*#define PREHEAT_3_FAN_SPEED.*@&\n\n#define PREHEAT_4_LABEL       "ASA"\n#define PREHEAT_4_TEMP_HOTEND 240\n#define PREHEAT_4_TEMP_BED     90\n#define PREHEAT_4_TEMP_CHAMBER 35\n#define PREHEAT_4_FAN_SPEED     0@' Marlin/Marlin/Configuration.h
 
 # convenience
 sed -i 's@/*#define BROWSE_MEDIA_ON_INSERT@#define BROWSE_MEDIA_ON_INSERT@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -290,20 +295,24 @@ fi
 
 
 
-if [ "${BOARD:0:9}" == "skrminie3" ]; then
+if [ "${BOARD:0:3}" == "skr" ]; then
 
-  sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_btt@' ${MARLIN_DIR}/platformio.ini
+  case ${BOARD} in
+    skre3rrf) sed -i 's@default_envs.*=.*@default_envs = BIGTREE_E3_RRF@' ${MARLIN_DIR}/platformio.ini ;;
+    *)        sed -i 's@default_envs.*=.*@default_envs = STM32F103RC_btt@' ${MARLIN_DIR}/platformio.ini ;;
+  esac
+
+  case ${BOARD} in
+    skre3rrf)     sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_BTT_E3_RRF@' ${MARLIN_DIR}/Marlin/Configuration.h ;;
+    skrminie3v12) sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V1_2@' ${MARLIN_DIR}/Marlin/Configuration.h ;;
+    skrminie3v20) sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V2_0@' ${MARLIN_DIR}/Marlin/Configuration.h ;;
+  esac
 
   sed -i 's@#define SERIAL_PORT .*@#define SERIAL_PORT 2@' ${MARLIN_DIR}/Marlin/Configuration.h
 
   sed -i 's@/*#define SERIAL_PORT_2 .*@#define SERIAL_PORT_2 -1@' ${MARLIN_DIR}/Marlin/Configuration.h
 
   sed -i 's@#define BAUDRATE .*@#define BAUDRATE 115200@' ${MARLIN_DIR}/Marlin/Configuration.h
-
-  case ${BOARD} in
-    skrminie3v12) sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V1_2@' ${MARLIN_DIR}/Marlin/Configuration.h ;;
-    skrminie3v20) sed -i 's@ *#define MOTHERBOARD .*@  #define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V2_0@' ${MARLIN_DIR}/Marlin/Configuration.h ;;
-  esac
 
   sed -i 's@.*#define EMERGENCY_PARSER@#define EMERGENCY_PARSER@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
@@ -312,9 +321,12 @@ if [ "${BOARD:0:9}" == "skrminie3" ]; then
   sed -i 's@/*#define Z_DRIVER_TYPE .*@#define Z_DRIVER_TYPE  TMC2209@' ${MARLIN_DIR}/Marlin/Configuration.h
   sed -i 's@/*#define E0_DRIVER_TYPE .*@#define E0_DRIVER_TYPE TMC2209@' ${MARLIN_DIR}/Marlin/Configuration.h
 
+  sed -i 's@.*#define X_MICROSTEPS .*@    #define X_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h && X_STEPS=160
+  sed -i 's@.*#define Y_MICROSTEPS .*@    #define Y_MICROSTEPS     32@' ${MARLIN_DIR}/Marlin/Configuration_adv.h && Y_STEPS=160
+
   sed -i 's@.*#define ADAPTIVE_STEP_SMOOTHING@#define ADAPTIVE_STEP_SMOOTHING@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
-  sed -i 's@.*#define HYBRID_THRESHOLD@  #//define HYBRID_THRESHOLD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+  sed -i 's@.*#define HYBRID_THRESHOLD@  @//define HYBRID_THRESHOLD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
   sed -i 's@.*#define X_CURRENT .*@    #define X_CURRENT       580@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
   sed -i 's@.*#define Y_CURRENT .*@    #define Y_CURRENT       580@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
@@ -380,19 +392,16 @@ if [ "${BOARD}" != "melzi" ]; then
   if [ "${SENSOR}" == "bltouch" ]; then
 
     sed -i 's@.*#define CUSTOM_MENU_CONFIG@#define CUSTOM_MENU_CONFIG@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i 's@.*#define CUSTOM_MENU_CONFIG_TITLE .*@#define CUSTOM_MENU_CONFIG_TITLE "Builtin G-codes"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i 's@.*#define CUSTOM_MENU_CONFIG_TITLE .*@  #define CUSTOM_MENU_CONFIG_TITLE "Builtin G-codes"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i 's@.*#define CUSTOM_MENU_CONFIG_SCRIPT_DONE .*@  //#define CUSTOM_MENU_CONFIG_SCRIPT_DONE ""@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     sed -i 's@.*#define CONFIG_MENU_ITEM_1_DESC .*@  #define CONFIG_MENU_ITEM_1_DESC "Z Lubrication"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define CONFIG_MENU_ITEM_1_GCODE .*@  #define CONFIG_MENU_ITEM_1_GCODE "G90\\nG28\\nG0 Z0.2\\nG0 Z240\\nG0 Z0.2\\nG0 Z240\\nG0 Z0.2\\nG0 Z240\\nG0 Z0.2\\nG0 Z240\\nG0 Z0.2\\nG27 P2\\nM84 X Y E"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define CONFIG_MENU_ITEM_1_CONFIRM@  #define CONFIG_MENU_ITEM_1_CONFIRM@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     sed -i 's@.*#define CONFIG_MENU_ITEM_2_DESC .*@  #define CONFIG_MENU_ITEM_2_DESC "Z Calibration PLA"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i 's@.*#define CONFIG_MENU_ITEM_2_GCODE .*@  #define CONFIG_MENU_ITEM_2_GCODE "G90\\nM83\\nM104 S120\\nM140 S60\\nG28\\nG29\\nG0 F1200\\nG0 Z75\\nG0 X43 Y43\\nM104 S200\\nM190 S60\\nM109 S200\\nG0 X43 Y188\\nG0 Z0.2\\nG1 X188 Y188 E4.2612\\nG1 X188 Y164 E0.7053\\nG1 X43 Y164 E4.2612\\nG1 X43 Y140 E0.7053\\nG1 X188 Y140 E4.2612\\nG1 X188 Y116 E0.7053\\nG1 X43 Y116 E4.2612\\nG1 X43 Y92 E0.7053\\nG1 X188 Y92 E4.2612\\nG1 X188 Y68 E0.7053\\nG1 X43 Y68 E4.2612\\nG1 X43.0 Y44 E0.7053\\nG1 X43.45 Y44 E0.0132\\nG1 X43.45 Y67.55 E0.7053\\nG1 X43.9 Y67.55 E0.0132\\nG1 X43.9 Y44 E0.7053\\nG1 X44.35 Y44 E0.0132\\nG1 X44.35 Y67.55 E0.7053\\nG1 X44.8 Y67.55 E0.0132\\nG1 X44.8 Y44 E0.7053\\nG1 X45.25 Y44 E0.0132\\nG1 X45.25 Y67.55 E0.7053\\nG1 X45.7 Y67.55 E0.0132\\nG1 X45.7 Y44 E0.7053\\nG1 X46.15 Y44 E0.0132\\nG1 X46.15 Y67.55 E0.7053\\nG1 X46.6 Y67.55 E0.0132\\nG1 X46.6 Y44 E0.7053\\nG1 X47.05 Y44 E0.0132\\nG1 X47.05 Y67.55 E0.7053\\nG1 X47.5 Y67.55 E0.0132\\nG1 X47.5 Y44 E0.7053\\nG1 X47.95 Y44 E0.0132\\nG1 X47.95 Y67.55 E0.7053\\nG1 X48.4 Y67.55 E0.0132\\nG1 X48.4 Y44 E0.7053\\nG1 X48.85 Y44 E0.0132\\nG1 X48.85 Y67.55 E0.7053\\nG1 X49.3 Y67.55 E0.0132\\nG1 X49.3 Y44 E0.7053\\nG1 X49.75 Y44 E0.0132\\nG1 X49.75 Y67.55 E0.7053\\nG1 X50.2 Y67.55 E0.0132\\nG1 X50.2 Y44 E0.7053\\nG1 X50.65 Y44 E0.0132\\nG1 X50.65 Y67.55 E0.7053\\nG1 X51.1 Y67.55 E0.0132\\nG1 X51.1 Y44 E0.7053\\nG1 X51.55 Y44 E0.0132\\nG1 X51.55 Y67.55 E0.7053\\nG1 X52.0 Y67.55 E0.0132\\nG1 X52.0 Y44 E0.7053\\nG1 X52.45 Y44 E0.0132\\nG1 X52.45 Y67.55 E0.7053\\nG1 X52.9 Y67.55 E0.0132\\nG1 X52.9 Y44 E0.7053\\nG1 X53.35 Y44 E0.0132\\nG1 X53.35 Y67.55 E0.7053\\nG1 X53.8 Y67.55 E0.0132\\nG1 X53.8 Y44 E0.7053\\nG1 X54.25 Y44 E0.0132\\nG1 X54.25 Y67.55 E0.7053\\nG1 X54.7 Y67.55 E0.0132\\nG1 X54.7 Y44 E0.7053\\nG1 X55.15 Y44 E0.0132\\nG1 X55.15 Y67.55 E0.7053\\nG1 X55.6 Y67.55 E0.0132\\nG1 X55.6 Y44 E0.7053\\nG1 X56.05 Y44 E0.0132\\nG1 X56.05 Y67.55 E0.7053\\nG1 X56.5 Y67.55 E0.0132\\nG1 X56.5 Y44 E0.7053\\nG1 X56.95 Y44 E0.0132\\nG1 X56.95 Y67.55 E0.7053\\nG1 X57.4 Y67.55 E0.0132\\nG1 X57.4 Y44 E0.7053\\nG1 X57.85 Y44 E0.0132\\nG1 X57.85 Y67.55 E0.7053\\nG1 X58.3 Y67.55 E0.0132\\nG1 X58.3 Y44 E0.7053\\nG1 X58.75 Y44 E0.0132\\nG1 X58.75 Y67.55 E0.7053\\nG1 X59.2 Y67.55 E0.0132\\nG1 X59.2 Y44 E0.7053\\nG1 X59.65 Y44 E0.0132\\nG1 X59.65 Y67.55 E0.7053\\nG1 X60.1 Y67.55 E0.0132\\nG1 X60.1 Y44 E0.7053\\nG1 X60.55 Y44 E0.0132\\nG1 X60.55 Y67.55 E0.7053\\nG1 X61.0 Y67.55 E0.0132\\nG1 X61.0 Y44 E0.7053\\nG1 X61.45 Y44 E0.0132\\nG1 X61.45 Y67.55 E0.7053\\nG1 X61.9 Y67.55 E0.0132\\nG1 X61.9 Y44 E0.7053\\nG1 X62.35 Y44 E0.0132\\nG1 X62.35 Y67.55 E0.7053\\nG1 X62.8 Y67.55 E0.0132\\nG1 X62.8 Y44 E0.7053\\nG1 X63.25 Y44 E0.0132\\nG1 X63.25 Y67.55 E0.7053\\nG1 X63.7 Y67.55 E0.0132\\nG1 X63.7 Y44 E0.7053\\nG1 X64.15 Y44 E0.0132\\nG1 X64.15 Y67.55 E0.7053\\nG1 X64.6 Y67.55 E0.0132\\nG1 X64.6 Y44 E0.7053\\nG1 X65.05 Y44 E0.0132\\nG1 X65.05 Y67.55 E0.7053\\nG1 X65.5 Y67.55 E0.0132\\nG1 X65.5 Y44 E0.7053\\nG1 X65.95 Y44 E0.0132\\nG1 X65.95 Y67.55 E0.7053\\nG1 X66.4 Y67.55 E0.0132\\nG1 X66.4 Y44 E0.7053\\nM104 S0\\nM140 S0\\nG27 P2\\nM84 X Y E\\nM107"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
+    sed -i 's@.*#define CONFIG_MENU_ITEM_2_GCODE .*@  #define CONFIG_MENU_ITEM_2_GCODE "G90\\nM83\\nM104 S120\\nM140 I0\\nG28\\nG29\\nG0 F1200\\nG0 Z75\\nG0 X43 Y43\\nM104 I0\\nM190 I0\\nM109 I0\\nG0 X43 Y188\\nG0 Z0.2\\nG1 X188 Y188 E4.2612\\nG1 X188 Y164 E0.7053\\nG1 X43 Y164 E4.2612\\nG1 X43 Y140 E0.7053\\nG1 X188 Y140 E4.2612\\nG1 X188 Y116 E0.7053\\nG1 X43 Y116 E4.2612\\nG1 X43 Y92 E0.7053\\nG1 X188 Y92 E4.2612\\nG1 X188 Y68 E0.7053\\nG1 X43 Y68 E4.2612\\nG1 X43.0 Y44 E0.7053\\nG1 X43.45 Y44 E0.0132\\nG1 X43.45 Y67.55 E0.7053\\nG1 X43.9 Y67.55 E0.0132\\nG1 X43.9 Y44 E0.7053\\nG1 X44.35 Y44 E0.0132\\nG1 X44.35 Y67.55 E0.7053\\nG1 X44.8 Y67.55 E0.0132\\nG1 X44.8 Y44 E0.7053\\nG1 X45.25 Y44 E0.0132\\nG1 X45.25 Y67.55 E0.7053\\nG1 X45.7 Y67.55 E0.0132\\nG1 X45.7 Y44 E0.7053\\nG1 X46.15 Y44 E0.0132\\nG1 X46.15 Y67.55 E0.7053\\nG1 X46.6 Y67.55 E0.0132\\nG1 X46.6 Y44 E0.7053\\nG1 X47.05 Y44 E0.0132\\nG1 X47.05 Y67.55 E0.7053\\nG1 X47.5 Y67.55 E0.0132\\nG1 X47.5 Y44 E0.7053\\nG1 X47.95 Y44 E0.0132\\nG1 X47.95 Y67.55 E0.7053\\nG1 X48.4 Y67.55 E0.0132\\nG1 X48.4 Y44 E0.7053\\nG1 X48.85 Y44 E0.0132\\nG1 X48.85 Y67.55 E0.7053\\nG1 X49.3 Y67.55 E0.0132\\nG1 X49.3 Y44 E0.7053\\nG1 X49.75 Y44 E0.0132\\nG1 X49.75 Y67.55 E0.7053\\nG1 X50.2 Y67.55 E0.0132\\nG1 X50.2 Y44 E0.7053\\nG1 X50.65 Y44 E0.0132\\nG1 X50.65 Y67.55 E0.7053\\nG1 X51.1 Y67.55 E0.0132\\nG1 X51.1 Y44 E0.7053\\nG1 X51.55 Y44 E0.0132\\nG1 X51.55 Y67.55 E0.7053\\nG1 X52.0 Y67.55 E0.0132\\nG1 X52.0 Y44 E0.7053\\nG1 X52.45 Y44 E0.0132\\nG1 X52.45 Y67.55 E0.7053\\nG1 X52.9 Y67.55 E0.0132\\nG1 X52.9 Y44 E0.7053\\nG1 X53.35 Y44 E0.0132\\nG1 X53.35 Y67.55 E0.7053\\nG1 X53.8 Y67.55 E0.0132\\nG1 X53.8 Y44 E0.7053\\nG1 X54.25 Y44 E0.0132\\nG1 X54.25 Y67.55 E0.7053\\nG1 X54.7 Y67.55 E0.0132\\nG1 X54.7 Y44 E0.7053\\nG1 X55.15 Y44 E0.0132\\nG1 X55.15 Y67.55 E0.7053\\nG1 X55.6 Y67.55 E0.0132\\nG1 X55.6 Y44 E0.7053\\nG1 X56.05 Y44 E0.0132\\nG1 X56.05 Y67.55 E0.7053\\nG1 X56.5 Y67.55 E0.0132\\nG1 X56.5 Y44 E0.7053\\nG1 X56.95 Y44 E0.0132\\nG1 X56.95 Y67.55 E0.7053\\nG1 X57.4 Y67.55 E0.0132\\nG1 X57.4 Y44 E0.7053\\nG1 X57.85 Y44 E0.0132\\nG1 X57.85 Y67.55 E0.7053\\nG1 X58.3 Y67.55 E0.0132\\nG1 X58.3 Y44 E0.7053\\nG1 X58.75 Y44 E0.0132\\nG1 X58.75 Y67.55 E0.7053\\nG1 X59.2 Y67.55 E0.0132\\nG1 X59.2 Y44 E0.7053\\nG1 X59.65 Y44 E0.0132\\nG1 X59.65 Y67.55 E0.7053\\nG1 X60.1 Y67.55 E0.0132\\nG1 X60.1 Y44 E0.7053\\nG1 X60.55 Y44 E0.0132\\nG1 X60.55 Y67.55 E0.7053\\nG1 X61.0 Y67.55 E0.0132\\nG1 X61.0 Y44 E0.7053\\nG1 X61.45 Y44 E0.0132\\nG1 X61.45 Y67.55 E0.7053\\nG1 X61.9 Y67.55 E0.0132\\nG1 X61.9 Y44 E0.7053\\nG1 X62.35 Y44 E0.0132\\nG1 X62.35 Y67.55 E0.7053\\nG1 X62.8 Y67.55 E0.0132\\nG1 X62.8 Y44 E0.7053\\nG1 X63.25 Y44 E0.0132\\nG1 X63.25 Y67.55 E0.7053\\nG1 X63.7 Y67.55 E0.0132\\nG1 X63.7 Y44 E0.7053\\nG1 X64.15 Y44 E0.0132\\nG1 X64.15 Y67.55 E0.7053\\nG1 X64.6 Y67.55 E0.0132\\nG1 X64.6 Y44 E0.7053\\nG1 X65.05 Y44 E0.0132\\nG1 X65.05 Y67.55 E0.7053\\nG1 X65.5 Y67.55 E0.0132\\nG1 X65.5 Y44 E0.7053\\nG1 X65.95 Y44 E0.0132\\nG1 X65.95 Y67.55 E0.7053\\nG1 X66.4 Y67.55 E0.0132\\nG1 X66.4 Y44 E0.7053\\nM104 S0\\nM140 S0\\nG27 P2\\nM84 X Y E\\nM107"@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
     sed -i 's@.*#define CONFIG_MENU_ITEM_2_CONFIRM@  #define CONFIG_MENU_ITEM_2_CONFIRM@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-
-    # z-offset wizard
-    sed -i 's@/*#define PROBE_OFFSET_WIZARD@#define PROBE_OFFSET_WIZARD@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
-    sed -i 's@#define PROBE_OFFSET_START .*@#define PROBE_OFFSET_START -4.0@' ${MARLIN_DIR}/Marlin/Configuration_adv.h
 
     # bltouch probe on probe connector
     sed -i 's@.*#define MESH_BED_LEVELING@//#define MESH_BED_LEVELING@' ${MARLIN_DIR}/Marlin/Configuration.h
@@ -426,7 +435,7 @@ if [ "${BOARD}" != "melzi" ]; then
     sed -i 's@/*#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN@' ${MARLIN_DIR}/Marlin/Configuration.h
 
     # use probe connector as z-endstop connector
-    sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN                          PC14  // "Z-STOP" (BLTouch)@' ${MARLIN_DIR}/Marlin/src/pins/stm32f1/pins_BTT_SKR_MINI_E3_common.h
+    sed -i 's@.*#define Z_STOP_PIN.*@#define Z_STOP_PIN                          PC14  // Z-STOP (BLTouch)@' ${MARLIN_DIR}/Marlin/src/pins/stm32f1/pins_BTT_SKR_MINI_E3_common.h
 
   fi
 
@@ -435,10 +444,11 @@ fi
 
 
 if [ "${EXTRUDER}" == "minibmg" ]; then
-  sed -i 's@.*#define INVERT_E0_DIR .*@#define INVERT_E0_DIR false@' ${MARLIN_DIR}/Marlin/Configuration.h
-  sed -i 's@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 400, 140 }@' ${MARLIN_DIR}/Marlin/Configuration.h
+  sed -i 's@.*#define INVERT_E0_DIR .*@#define INVERT_E0_DIR false@' ${MARLIN_DIR}/Marlin/Configuration.h && E_STEPS=140
 fi
 
+
+sed -i "s@.*#define DEFAULT_AXIS_STEPS_PER_UNIT .*@#define DEFAULT_AXIS_STEPS_PER_UNIT   { ${X_STEPS}, ${Y_STEPS}, ${Z_STEPS}, ${E_STEPS} }@" ${MARLIN_DIR}/Marlin/Configuration.h
 
 
 (cd ${MARLIN_DIR}; ../${VENV_DIR}/bin/platformio run)
@@ -450,5 +460,5 @@ ls -lh ${MARLIN_DIR}/.pio/build/*/firmware.*
 
 
 if [ "${BOARD}" != "skrminie3v12" ] || [ "${EXTRUDER}" != "minibmg" ] || [ "${SENSOR}" != "bltouch" ]; then
-  echo "WARNING: Untested build configuration '${BOARD}/${EXTRUDER}/${SENSOR}' ..."
+  echo "WARNING: Untested build configuration '${BOARD} ${EXTRUDER} ${SENSOR}' ..."
 fi
