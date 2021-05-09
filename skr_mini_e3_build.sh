@@ -14,7 +14,7 @@ CONFIG_BASE='Creality/Ender-3 Pro/CrealityV1'
 
 
 
-SRC_BRANCH=64a7dfbe7d76a4d05663e597fbaeeecb95069a66 # from 2.0.x
+SRC_BRANCH=76ec7040f1209ea9e0f0132782be62f3054601bb # from 2.0.x
 CFG_BRANCH=99442f5efb1e8067d219947615ab0f1f5edd15f0 # from release-2.0.8
 
 
